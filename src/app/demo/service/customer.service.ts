@@ -7,12 +7,6 @@ export class CustomerService {
 
     constructor(private http: HttpClient) { }
 
-    getCustomersSmall() {
-        return this.http.get<any>('assets/demo/data/customers-small.json')
-            .toPromise()
-            .then(res => res.data as Customer[])
-            .then(data => data);
-    }
 
     getCustomersMedium() {
         return this.http.get<any>('assets/demo/data/customers-medium.json')
