@@ -9,6 +9,9 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
             {
                 path: '', component: AppLayoutComponent,
                 children: [
+                    {path: 'divisiones', loadChildren: () => import('./demo/components/divisiones/divisiones.module').then(m => m.DivisionesModule)},
+                    {path: 'puestos', loadChildren: () => import('./demo/components/puesto/puesto.module').then(m => m.PuestoModule)},
+                    {path: 'empleados', loadChildren: () => import('./demo/components/empleados/empleados.module').then(m =>m.EmpleadosModule)},
                     { path: '', loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
                     { path: 'uikit', loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule) },
                     { path: 'utilities', loadChildren: () => import('./demo/components/utilities/utilities.module').then(m => m.UtilitiesModule) },

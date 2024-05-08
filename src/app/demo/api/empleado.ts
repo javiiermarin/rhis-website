@@ -1,3 +1,7 @@
+import {EmpleadoReferencia} from "./empleadoReferencia";
+import {ExperienciaLaboral} from "./experienciaLaboral";
+import {NivelAcademico} from "./nivelAcademico";
+
 export class Empleado {
     idEmpleado : string;
     nombres : string;
@@ -11,5 +15,17 @@ export class Empleado {
     nacionalidad : string;
     nivelIngles : string;
     fechaRegistro : string;
+    fechaNacimiento : string;
+    fechaIngreso : string;
+    fechaSalida : string;
+    habilitado : boolean;
+    estadoCivil : string;
+    salario : number;
+    puesto : string;
+    empleadoReferencia : EmpleadoReferencia;
+    experienciaLaboral : ExperienciaLaboral;
+    nivelAcademico : NivelAcademico;
+
+
 
 }
