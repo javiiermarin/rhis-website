@@ -10,8 +10,6 @@ import {MenuItem} from "primeng/api";
 })
 export class AppMenuComponent implements OnInit {
 
-    model: any[] = [];
-
     items: MenuItem[];
 
     constructor(public layoutService: LayoutService) { }
@@ -32,12 +30,19 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-id-card',
                         items: [
                             {
+                                label: 'Mi perfil',
+                                icon: 'pi pi-user',
+                                routerLink: ['/perfil']
+                            },
+                            {
                                 label: 'Vacaciones',
-                                icon: 'pi pi-calendar-minus'
+                                icon: 'pi pi-calendar-minus',
+                                routerLink: ['/vacaciones']
                             },
                             {
                                 label: 'Permisos',
-                                icon: 'pi pi-calendar'
+                                icon: 'pi pi-calendar',
+                                routerLink: ['/permisos']
                             }
                         ]},
                     {
@@ -49,29 +54,89 @@ export class AppMenuComponent implements OnInit {
                                 icon: "pi pi-user-edit",
                                 items:[
                                     {
-                                        label: "Registrar Personal",
-                                        icon: "pi pi-user-edit"
-                                    },
-                                    {
-                                        label: "Buscar Empleados",
-                                        icon: 'pi pi-search',
+                                        label: "Empleados",
+                                        icon: 'pi pi-user-edit',
                                         routerLink: ['/empleados']
                                     },
                                 ]
 
                             },
                             {
+                                label: 'Gestion de ausencias',
+                                icon: '',
+                                items: [
+                                    {
+                                        label: 'Permisos',
+                                        icon: 'pi pi-calendar',
+                                        routerLink: ['/permisosTracking']
+                                    },
+                                    {
+                                        label: 'Vacaciones',
+                                        icon: 'pi pi-calendar-minus',
+                                        routerLink: ['/vacacionesTracking']
+                                    }
+
+                                ]
+                            },
+                            {
+                                label: 'Control de Asistencia',
+                                icon: '',
+                                items: [
+                                    {
+                                        label: 'Marcacion',
+                                        icon: 'pi pi-clock',
+                                        routerLink: ['/marcacion']
+                                    },
+                                    {
+                                        label: 'Asistencias',
+                                        icon: 'pi pi-clock',
+                                        routerLink: ['/asistencia']
+
+                                    }
+
+                                ]
+                            },
+                            {
+                                label: 'Impuestos',
+                                icon: '',
+                                items: [
+                                    {
+                                        label: 'Impuestos',
+                                        icon: '',
+                                        routerLink: ['/impuestos']
+                                    }
+
+                                ]
+                            },
+                            {
+                                label: 'Jornadas',
+                                icon: 'pi pi-hourglass',
+                                routerLink: ['/jornadas']
+                            },
+                            {
+                                label: 'Planilla',
+                                icon: 'pi pi-money-bill',
+                                routerLink: ['/planilla']
+                            }
+                        ],
+                        },
+                    {
+                        label: 'Administracion',
+                        icon: 'pi pi-briefcase',
+                        items:[
+                            {
                                 label: "Divisiones",
-                                icon: 'pi pi-search',
+                                icon: 'pi pi-th-large',
                                 routerLink: ['/divisiones']
                             },
                             {
                                 label: "Puestos",
-                                icon: 'pi pi-search',
-                                routerLink: ['./puestos']
+                                icon: 'pi pi-bars',
+                                routerLink: ['/puestos']
                             }
-                        ],
-                        },
+
+                        ]
+                    }
 
                 ]
             },

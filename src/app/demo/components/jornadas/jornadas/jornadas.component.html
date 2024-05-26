@@ -1,0 +1,92 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+
+                </ng-template>
+            </p-toolbar>
+        </div>
+        <p-table [value]="lstJornadasResponse" >
+            <ng-template pTemplate="caption">
+                <div class="flex">
+                    <h3>Jornadas</h3>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Jornada</th>
+                    <th>Hora Inicio</th>
+                    <th>Hora Final</th>
+                    <th>Valor</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-jornadas>
+                <tr>
+                    <td>
+                        {{jornadas.jornada}}
+                    </td>
+                    <td>
+                        {{jornadas.horaInicio}}
+                    </td>
+                    <td>
+                        {{jornadas.horaFin }}
+                    </td>
+                    <td>
+                        {{jornadas.valor | currency: 'Q'}}
+                    </td>
+                    <td>
+                        <div class="flex">
+                           <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded" (click)="abrirDialog()"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <p-dialog [(visible)]="jornadaDialog" [style]="{width: '500px'}" header="Jornadas" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label>Hora Inicio</label>
+                    <p-calendar
+                            [(ngModel)]="date3"
+                            [iconDisplay]="'input'"
+                            [showIcon]="true"
+                            [timeOnly]="true"
+                            appendTo="body"
+                            inputId="templatedisplay">
+                        <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                            <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                        </ng-template>
+                    </p-calendar>
+                </div>
+                <div class="field">
+                    <label>Hora Final</label>
+                    <p-calendar
+                            [(ngModel)]="date4"
+                            [iconDisplay]="'input'"
+                            [showIcon]="true"
+                            [timeOnly]="true"
+                            appendTo="body"
+                            inputId="templatedisplay">
+                        <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                            <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                        </ng-template>
+                    </p-calendar>
+                </div>
+                <div class="field">
+                    <label for="valor">Valor</label>
+                    <input type="number"  pInputText id="valor"/>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" class="p-button-text" (click)="ocultarDialog()"></button>
+                <button pButton label="Guardar" class="p-button-text" (click)="modificarJornada()"></button>
+            </ng-template>
+
+        </p-dialog>
+
+
+
+    </div>
+</div>

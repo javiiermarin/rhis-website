@@ -1,1 +1,267 @@
-<p>empleado works!</p>
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="Crear" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()" ></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="empleadosResponse"  responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['nombres','apellidos','isEnabled']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} entries" [(selection)]="selectedEmpleado" selectionMode="multiple" [rowHover]="true" dataKey="idEmpleado">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h3 class="m-0">Administrar Empleados</h3>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text"  placeholder="Buscando..."  class="w-full sm:w-auto"/>
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Puesto</th>
+                        <th>Division</th>
+                        <th>Telefono</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-empleadoResponse>
+                    <tr>
+                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">Nombres</span>
+                            {{empleadoResponse.nombres}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Apellidos</span>
+                            {{empleadoResponse.apellidos}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Puesto</span>
+                            {{empleadoResponse.puesto.nombre}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Division</span>
+                            {{empleadoResponse.puesto.division.nombre}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Telefono</span>
+                            {{empleadoResponse.telefono}}
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-secondary mr-2" (click)="editarEmpleado(empleadoResponse)"></button>
+                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editarEmpleado(empleadoResponse)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="eliminarEmpleado(empleadoResponse)"></button>
+
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="empleadoDialog" [style]="{width: '1300px'}" header="Empleado" [modal]="true" class="p-fluid">
+            <form [formGroup]="empleadoFormGroup">
+                <div class="grid">
+                    <div class="col-12 xl:col-6">
+                        <div class="card">
+                            <h3>Informacion Personal</h3>
+                            <div class="grid formgrid">
+                                    <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                        <input type="text" formControlName="nombres" pInputText placeholder="Nombres">
+                                        <div
+                                                *ngIf="empleadoFormGroup.controls.nombres.invalid && (empleadoFormGroup.controls.nombres.dirty || empleadoFormGroup.controls.nombres.touched)"
+                                                class="p-error">
+                                            <small *ngIf="empleadoFormGroup.controls.nombres.errors.required">El nombre es
+                                                requerido.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <input type="text" formControlName="apellidos" pInputText placeholder="Apellidos">
+                                        <div
+                                            *ngIf="empleadoFormGroup.controls.apellidos.invalid && (empleadoFormGroup.controls.apellidos.dirty || empleadoFormGroup.controls.apellidos.touched)"
+                                            class="p-error">
+                                        <small *ngIf="empleadoFormGroup.controls.apellidos.errors.required">El apellido es
+                                            requerido.</small>
+                                        </div>
+                                    </div>
+                            </div>
+                            <h5></h5>
+                            <div class="grid formgrid">
+                                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <input type="text" formControlName="dpi" pInputText placeholder="DPI">
+                                    <div
+                                        *ngIf="empleadoFormGroup.controls.dpi.invalid && (empleadoFormGroup.controls.dpi.dirty || empleadoFormGroup.controls.dpi.touched)"
+                                        class="p-error">
+                                        <small *ngIf="empleadoFormGroup.controls.dpi.errors.required">El DPI es requerido</small>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <input type="text" formControlName="nit" pInputText placeholder="Nit">
+                                </div>
+
+                            </div>
+                            <h5></h5>
+                            <div class="grid formgrid">
+                                <div class="col-12 mb-2 lg:col-10 lg:mb-0">
+                                    <input type="text" formControlName="direccion" pInputText placeholder="Direccion">
+                                    <div
+                                        *ngIf="empleadoFormGroup.controls.direccion.invalid && (empleadoFormGroup.controls.direccion.dirty || empleadoFormGroup.controls.direccion.touched)"
+                                        class="p-error">
+                                        <small *ngIf="empleadoFormGroup.controls.direccion.errors.required">La direccion es requerida</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5></h5>
+                            <div class="grid formgrid">
+                                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <input type="text" formControlName="nacionalidad" pInputText placeholder="Nacionalidad">
+                                </div>
+                                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <p-calendar placeholder="Fecha Nacimiento" formControlName="fechaNacimiento"/>
+                                </div>
+                            </div>
+                            <h4></h4>
+                            <div class="grid formgrid">
+                                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <p-calendar placeholder="Fecha Ingreso" formControlName="fechaIngreso"/>
+                                </div>
+                                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                                    <p-calendar placeholder="Fecha Salida" formControlName="fechaSalida"/>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card">
+                            <h3>Informacio de contacto</h3>
+                            <div class="grid formgrid">
+                                <div class="col-12 mb-2 lg:col-4 lg:mb-0">
+                                    <input type="text" pInputText placeholder="Telefono" formControlName="telefono">
+                                </div>
+                                <div class="col-12 mb-2 lg:col-6 lg:mb-0">
+                                    <input type="text" pInputText placeholder="Correo" formControlName="correo">
+                                    <div class="p-error" *ngIf="empleadoFormGroup.controls.correo.invalid">
+                                        <small *ngIf="empleadoFormGroup.controls.correo.errors.email">Verificar el formato del correo</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Informacio del puesto</h3>
+                            <div class="grid formgrid">
+                                <div class="col-5 mb-2 lg:col-5 lg:mb-0">
+                                    <label for="puesto">Puesto</label>
+                                    <p-dropdown id="puesto" [autoDisplayFirst]="false" [options]="lstpuestosResponse"
+                                                placeholder="Selecciona un puesto"
+                                                formControlName="puesto"
+                                                optionLabel="nombre" optionValue="idPuesto"></p-dropdown>
+                                </div>
+                                <div class="col-5 mb-2 lg:col-5 lg:mb-0">
+                                    <input type="number" pInputText placeholder="Salario" formControlName="salario">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="col-12 xl:col-6">
+                <div class="card">
+                    <h3>Referencias</h3>
+                    <h5>Referencia 1</h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Nombres" [(ngModel)]="empleadoReferencia1.nombres">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Apellidos" [(ngModel)]="empleadoReferencia1.apellidos">
+                        </div>
+                    </div>
+                    <h5></h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Telefono" [(ngModel)]="empleadoReferencia1.telefono">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Relacion" [(ngModel)]="empleadoReferencia1.descripcion">
+                        </div>
+                    </div>
+                    <h5>Referencia 2</h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Nombres"[(ngModel)]="empleadoReferencia2.nombres">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Apellidos" [(ngModel)]="empleadoReferencia2.apellidos">
+                        </div>
+                    </div>
+                    <h5></h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Telefono" [(ngModel)]="empleadoReferencia2.telefono">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Relacion" [(ngModel)]="empleadoReferencia2.descripcion">
+                        </div>
+                    </div>
+                    <h5>Referencia 3</h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Nombres" [(ngModel)]="empleadoReferencia3.nombres">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Apellidos" [(ngModel)]="empleadoReferencia3.apellidos">
+                        </div>
+                    </div>
+                    <h5></h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Telefono" [(ngModel)]="empleadoReferencia3.telefono">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Relacion" [(ngModel)]="empleadoReferencia3.descripcion">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Experiencia Laboral</h3>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Nombre empresa" [(ngModel)]="experienciaLaboral.nombreEmpresa">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Telefono" [(ngModel)]="experienciaLaboral.telefono">
+                        </div>
+                    </div>
+                    <h5></h5>
+                    <div class="grid formgrid">
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="number" pInputText placeholder="Antiguedad"[(ngModel)]="experienciaLaboral.antiguedad">
+                        </div>
+                        <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                            <input type="text" pInputText placeholder="Puesto" [(ngModel)]="experienciaLaboral.puesto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="ocultarDialogo()"></button>
+            <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="crearEmpleado()"></button>
+            <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text" (click)="modificarEmpleado()"></button>
+        </p-dialog>
+        <p-dialog [(visible)]="eliminarEmpleadoDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <!--<span *ngIf="division">Quieres borrar .. <b>{{division.nombre}}</b>?</span>-->
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="eliminarEmpleadoDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Si" (click)="confirmarEliminacion()"></button>
+            </ng-template>
+        </p-dialog>
+
+    </div>
+</div>
+
