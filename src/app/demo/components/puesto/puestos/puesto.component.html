@@ -1,1 +1,107 @@
-<p>puesto works!</p>
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="puestosResponse" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['nombre','salarioMaximo','salarioMinimo','division']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando{first} de {last} de {totalRecords} entries" [(selection)]="selectPuesto" selectionMode="multiple" [rowHover]="true" dataKey="idPuesto">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h3 class="m-0">Administracion de puestos</h3>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscando..."  class="w-full sm:w-auto"/>
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon></th>
+                        <th pSortableColumn="salario_maixmo">Salario Maximo <p-sortIcon field="salario_maximo"></p-sortIcon></th>
+                        <th pSortableColumn="salario_minimo">Salario Minimo <p-sortIcon field="salario_minimo"></p-sortIcon></th>
+                        <th pSortableColumn="division">Division <p-sortIcon field="division"></p-sortIcon></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-puestos>
+                    <tr>
+                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">Nombre</span>
+                            {{puestos.nombre}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Salario Maximo</span>
+                            {{puestos.salarioMaximo | currency: 'Q'}}
+                        </td>
+                        <td style="width:14%; min-width:8rem;">
+                            <span class="p-column-title">Salario Minimo</span>
+                            {{puestos.salarioMinimo| currency:'Q'}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Division</span>
+                            {{puestos.division.nombre}}
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editPuesto(puestos)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deletePuesto(puestos)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="productDialog" [style]="{width: '450px'}" header="Detalles del puesto" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" pInputText id="nombre" [(ngModel)]="puesto.nombre" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !puesto.nombre}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !puesto.nombre">Nombre obligatorio.</small>
+                </div>
+                <div class="field">
+                    <p-dropdown
+                            [options]="divisionesResponse"
+                            [(ngModel)]="selectedDivision"
+                            placeholder="Selecciona una division"
+                            [editable]="true"
+                            appendTo="body"
+                            optionLabel="nombre" />
+                </div>
+                <div class="formgrid grid">
+                    <div class="field col">
+                        <label for="salario_maximo">Salario Maximo</label>
+                        <p-inputNumber id="salario_maximo" [(ngModel)]="puesto.salarioMaximo"></p-inputNumber>
+                    </div>
+                    <div class="field col">
+                        <label for="salario_minimo">Salario Minimo</label>
+                        <p-inputNumber id="salario_minimo" [(ngModel)]="puesto.salarioMinimo"></p-inputNumber>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="crearPuesto()"></button>
+                <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text" (click)="editarPuesto()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteProductDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="product">Estas seguro de que quieres eliminar  <b>{{product.name}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProductDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Si" (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+    </div>
+</div>
+

@@ -1,0 +1,93 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="Solicitar un permiso" icon="pi pi-plus" class="p-button-success" (click)=abrirDialog()></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+            <p-table #dt [value]="lstPermisoResponse" responsiveLayout="scroll" [rows]="10" [rowHover]="true">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row">
+                        <h3>Mis Permisos</h3>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Descripcion</th>
+                        <th>Estado Jefe Inmediato</th>
+                        <th>Estado Jefe RRHH</th>
+                        <th>Estado</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-permiso>
+                    <tr>
+                        <td>
+                            {{permiso.descripcion}}
+                        </td>
+                        <td>
+                            {{permiso.permisoTracking.empleado}}
+                        </td>
+
+
+
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="permisosDialog" [style]="{width:'700px'}" header="Solicitar un Permiso" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="col-5 mb-2 lg:col-5 lg:mb-0">
+                    <label>Tipo de permiso</label>
+                    <p-dropdown
+                            [options]="lstTipoPermisos"
+                            optionLabel="nombre"
+                            [(ngModel)]="selectedTipoPermiso"
+                            emptyFilterMessage="true"
+                            placeholder="Selecciona una opcion"
+                            [editable]="true"
+                            appendTo="body"/>
+                </div>
+                <div class="col-5 mb-2 lg:col-3 lg:mb-0">
+                    <label>Fecha Inicio</label>
+                    <p-calendar appendTo="body"></p-calendar>
+                </div>
+                <div class="col-5 mb-2 lg:col-5 lg:mb-0">
+                    <label>Fecha Fin</label>
+                    <p-calendar appendTo="body"></p-calendar>
+                </div>
+                <div class="col-12 mb-2 lg:col-8 lg:mb-7">
+                    <label for="descripcion">Descripcion</label>
+                    <textarea
+                            id="descripcion"
+                            rows="5"
+                            cols="30"
+                            pInputTextarea
+                            [autoResize]="true">
+                    </textarea>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="ocultarDialog()"></button>
+                <button pButton pRipple label="Solicitar" icon="pi pi-plus" class="p-button-text"></button>
+
+
+            </ng-template>
+
+
+        </p-dialog>
+
+
+
+
+
+
+
+
+
+
+    </div>
+</div>

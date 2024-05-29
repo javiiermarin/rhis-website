@@ -1,0 +1,97 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-table #dt [value]="listVacaciones" responsiveLayout="scroll" [rows]="10" [rowHover]="true">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between">
+                        <h3>Solicitudes de Vacaciones</h3>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Empleado</th>
+                        <th>Descripcion</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Final</th>
+                        <th>Ver Estados</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-xx>
+                    <tr>
+                        <td>
+                            {{xx.empleado.nombres}}
+                        </td>
+                        <td>
+                            {{xx.descripcion}}
+                        </td>
+                        <td>
+                            {{xx.fechaInicio}}
+                        </td>
+                        <td>
+                            {{xx.fechaFinal}}
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" (click)="verEstado(xx)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="estadoDialog" [style]="{width:'650px'}" header="Estado de mis vacaciones" [modal]="true">
+            <p-table [value]="estados">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Estado</th>
+                        <th>Verificacion</th>
+                        <th>Division</th>
+                        <th>Aprobar</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-vacaciones>
+                    <tr>
+                        <td>
+                            <p-badge value="Aprobado" severity="success" *ngIf="vacaciones.estado"></p-badge>
+                            <p-badge value="No aprobado" severity="danger" *ngIf="!vacaciones.estado"></p-badge>
+
+                        </td>
+                        <td>
+                            {{vacaciones.empleado.nombres}}
+                        </td>
+                        <td>
+                            {{vacaciones.empleado.puesto.nombre}}
+                        </td>
+                        <td>
+                            <button icon="pi pi-check"*ngIf="!vacaciones.estado" pButton pRipple class="p-button-rounded" (click)="modificarEstado(vacaciones)"></button>
+                        </td>
+                    </tr>
+
+                </ng-template>
+            </p-table>
+
+        </p-dialog>
+
+        <p-dialog [(visible)]="vacacionesDialog" [style]="{width:'500px'}" header="Solicitar vacaciones" [modal]="true">
+            <ng-template pTemplate="content">
+                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                    <label>Fecha Inicio</label>
+                    <p-calendar appendTo="body" [minDate]="fechaMinima"  [(ngModel)]="vacaciones.fechaInicio"/>
+                </div>
+                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                    <label>Fecha Final</label>
+                    <p-calendar appendTo="body" [minDate]="fechaMinima" [(ngModel)]="vacaciones.fechaFinal"></p-calendar>
+                </div>
+                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
+                    <label for="descripcion">Descripcion</label>
+                    <textarea id="descripcion" pInputTextarea [(ngModel)]="vacaciones.descripcion"></textarea>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="oculatarDialog()"></button>
+                <button pButton pRipple label="Crear" icon="pi pi-check" class="p-button-text" (click)="solicitudVacaciones()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

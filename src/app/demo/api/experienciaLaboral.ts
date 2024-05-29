@@ -1,4 +1,5 @@
 export class ExperienciaLaboral{
+
     idExperienciaLaboral : string;
     nombreEmpresa : string;
     antiguedad : number;

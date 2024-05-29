@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {Empleado} from "../api/empleado";
+import {EmpleadoResponse} from "../api/empleadoResponse";
+import {EmpleadoRequest} from "../api/empleadoRequest";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,15 @@ export class EmpleadoService {
   constructor(private http : HttpClient) { }
 
   obtenerEmpleados(){
-    return this.http.get<Empleado[]>(this.url);
+    return this.http.get<EmpleadoResponse[]>(this.url);
+  }
+
+  crearEmpleado(empleadoRequest: EmpleadoRequest){
+    return this.http.post(this.url, empleadoRequest);
+  }
+
+  modificarEmpleado(empleadoRequest: EmpleadoRequest){
+    return this.http.put(this.url, empleadoRequest);
   }
 
 }

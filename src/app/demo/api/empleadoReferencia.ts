@@ -1,5 +1,5 @@
 export class EmpleadoReferencia{
-    idEmpleadoReferencia : string;
+    idEmpleadoReferencia? : string;
     nombres : string;
     apellidos : string;
     telefono : string;

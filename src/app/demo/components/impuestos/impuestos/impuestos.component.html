@@ -1,0 +1,89 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="Crear" icon="pi pi-plus" class="p-button-success mr-2" (click)="abrirDialog()" ></button>
+                    </div>
+                </ng-template>
+
+            </p-toolbar>
+
+            <p-table #dt [value]="listImpuestosResponse" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['nombre','encargado','isEnabled']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} entries" [(selection)]="impuestoSeleccionado" selectionMode="multiple" [rowHover]="true" dataKey="idImpuesto">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h3 class="m-0">Administrar Impuestos</h3>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text"  class="w-full sm:w-auto"/>
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon></th>
+                        <th pSortableColumn="encargado">Porcentaje <p-sortIcon field="porcentaje"></p-sortIcon></th>
+                        <th pSortableColumn="isEnabled">Descripcion <p-sortIcon field="isEnabled"></p-sortIcon></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-impuestos>
+                    <tr>
+                        <td>
+                            {{impuestos.nombre}}
+                        </td>
+                        <td>
+                            {{impuestos.porcentaje}}
+                        </td>
+                        <td>
+                            {{impuestos.descripcion}}
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editar(impuestos)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="eliminar(impuestos)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="impuestoDialogo" [style]="{width: '450px'}" header="Impuestos" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" pInputText id="nombre" [(ngModel)]="impuesto.nombre" />
+                </div>
+                <div class="field">
+                    <label for="porcentaje">Porcentaje</label>
+                    <input type="number" pInputText id="porcentaje" [(ngModel)]="impuesto.porcentaje">
+                </div>
+                <div class="field">
+                    <label for="descripcion">Descripcion</label>
+                    <textarea pInputTextarea id="descripcion" [(ngModel)]="impuesto.descripcion"></textarea>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="ocultarDialogo()"></button>
+                <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="crearImpuestos()"></button>
+                <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text" (click)="editarImpuestos()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="eliminarImpuestoDialogo" header="Confirmar" [style]="{width: '450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span >Estas seguro de que quieres eliminar</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="eliminarImpuestoDialogo = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Si" (click)="eliminarImpuesto()"></button>
+            </ng-template>
+
+        </p-dialog>
+
+    </div>
+</div>
+
