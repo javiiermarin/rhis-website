@@ -50,7 +50,6 @@ export class AsistenciaComponent  implements OnInit{
     this.horasExtrasService.obtenerHorasExtras().subscribe(data => this.lstHorasExtras = data);
   }
   mostrar(){
-    console.log(this.lstAsistenciasResponse)
   }
 
 

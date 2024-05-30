@@ -100,9 +100,8 @@ export class EmpleadoComponent implements OnInit{
 
   crearEmpleado(){
     if (!this.empleadoFormGroup.valid) {
-      console.log(this.empleadoFormGroup)
       this.empleadoFormGroup.markAllAsTouched();
-      this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'El formlario esta vacio' });
+      this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'El formulario tiene campos incompletos.' });
       return;
     }
 
