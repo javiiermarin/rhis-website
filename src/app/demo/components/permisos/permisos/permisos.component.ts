@@ -34,7 +34,6 @@ export class PermisosComponent implements OnInit{
     this.permiso = new PermisoResponse();
     this.permisoRequest = new PermisoRequest();
     this.permisosDialog = true;
-    console.log(this.lstPermisoResponse)
 
   }
 

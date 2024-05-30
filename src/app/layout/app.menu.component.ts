@@ -2,6 +2,13 @@ import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { LayoutService } from './service/app.layout.service';
 import {MenuItem} from "primeng/api";
+import {
+    getRolesAllowedAdministrationModule,
+    getRolesAllowedMyPortalModule,
+    getRolesAllowedRRHHModule
+} from "../utils/rolesAllowedUtils";
+import {decodeToken} from "../utils/jwt-utils";
+import {KeycloakService} from "keycloak-angular";
 
 @Component({
     selector: 'app-menu',
@@ -11,10 +18,14 @@ import {MenuItem} from "primeng/api";
 export class AppMenuComponent implements OnInit {
 
     items: MenuItem[];
+    userName: string = null;
 
-    constructor(public layoutService: LayoutService) { }
+    constructor(public layoutService: LayoutService, private keycloakService: KeycloakService,) { }
 
     ngOnInit() {
+        const jwtDecode: any = decodeToken(this.keycloakService.getKeycloakInstance().token)
+        this.userName = jwtDecode.name;
+        const roles: string[] = jwtDecode.realm_access?.roles || [];
         this.items = [
             {
                 label: 'Inicio',
@@ -28,6 +39,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Mi Portal',
                         icon: 'pi pi-fw pi-id-card',
+                        requiredRoles: getRolesAllowedMyPortalModule(),
                         items: [
                             {
                                 label: 'Mi perfil',
@@ -48,6 +60,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Recursos Humanos',
                         icon: 'pi pi-fw pi-users',
+                        requiredRoles: getRolesAllowedRRHHModule(),
                         items: [
                             {
                                 label: "Personal",
@@ -123,6 +136,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Administracion',
                         icon: 'pi pi-briefcase',
+                        requiredRoles: getRolesAllowedAdministrationModule(),
                         items:[
                             {
                                 label: "Divisiones",
@@ -180,5 +194,22 @@ export class AppMenuComponent implements OnInit {
             },*/
 
         ];
+        this.items = filterItemsByRoles(this.items, roles);
     }
+}
+
+/**
+ * Funcion que filtra los menu y submenus segun los roles requeridos
+ *
+ * @param items items del menu
+ * @param roles roles del usuario logueado
+ */
+function filterItemsByRoles(items: any[], roles: string[]): any[] {
+    return items.filter(item => !item.requiredRoles || item.requiredRoles.some((role: string) => roles.includes(role)))
+        .map(item => {
+            if (item.items && item.items.length > 0) {
+                item.items = filterItemsByRoles(item.items, roles);
+            }
+            return item;
+        });
 }

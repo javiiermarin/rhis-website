@@ -37,6 +37,5 @@ export class MarcacionComponent implements OnInit{
   generarMarcacion(){
     this.empleado.empleado = this.idEmpleado;
     this.marcacionService.generarMarcacion(this.empleado).subscribe(data => console.log(data))
-    console.log(this.empleado)
   }
 }
