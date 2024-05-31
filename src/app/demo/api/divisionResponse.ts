@@ -1,9 +1,8 @@
-import {EmpleadoResponse} from "./empleadoResponse";
+export class DivisionResponse {
+    idDivision: string;
+    nombre: string;
+    enabled: boolean;
+    encargado: string
 
-export class DivisionResponse{
-
-    idDivision : string;
-    nombre : string;
-    isEnabled : boolean;
-    //encargado : EmpleadoResponse = new EmpleadoResponse();
+    nombreEncargado?: string;
 }

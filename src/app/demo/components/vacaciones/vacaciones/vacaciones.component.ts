@@ -2,68 +2,134 @@ import {Component, OnInit} from '@angular/core';
 import {VacacionesService} from "../../../service/vacaciones.service";
 import {VacacionesRequest} from "../../../api/vacacionesRequest";
 import {VacacionesResponse} from "../../../api/vacacionesResponse";
-import {switchMap} from "rxjs";
+import {catchError, finalize, of, switchMap} from "rxjs";
 import {VacacionesTrackingResponse} from "../../../api/vacacionesTrackingResponse";
 import {format} from "date-fns";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {MessageService} from "primeng/api";
 
 @Component({
-  selector: 'app-vacaciones',
-  templateUrl: './vacaciones.component.html',
-  styleUrl: './vacaciones.component.scss'
+    selector: 'app-vacaciones',
+    templateUrl: './vacaciones.component.html',
+    styleUrl: './vacaciones.component.scss'
 })
-export class VacacionesComponent implements OnInit{
+export class VacacionesComponent implements OnInit {
 
-  idDivision: string= 'ee25a61b-67c9-449b-9ff6-879e38bdc919';
+    estados: VacacionesTrackingResponse [] = [];
+    fechaMinima: Date = new Date();
+    fechaFinalMinima: Date = new Date();
+    fechaInicio: string;
+    fechaFinal: string;
+    vacacionesDialog: boolean = false;
+    estadoDialog: boolean = false;
+    vacaciones: VacacionesRequest = new VacacionesRequest();
+    vacacionesResponse: VacacionesResponse[] = [];
+    vacationsFormGroup: FormGroup;
+    loading: boolean = false;
 
-  estados: VacacionesTrackingResponse [] = [];
+    constructor(private vacacionesService: VacacionesService,
+                private messageService: MessageService,) {
+    }
 
-  fechaMinima: Date = new Date();
+    ngOnInit() {
+        this.formGroupVacationsInit();
+        this.vacacionesService.obtenerVacaiones().subscribe(data =>
+            this.vacacionesResponse = data);
+    }
 
-  fechaInicio: string;
-  fechaFinal: string;
+    formGroupVacationsInit() {
+        this.vacationsFormGroup = this.createFormGroupVacations({
+            fechaInicio: null,
+            fechaFinal: null,
+            descripcion: null,
+        })
 
-  vacacionesDialog: boolean= false;
-  estadoDialog: boolean = false;
+        this.vacationsFormGroup.get('fechaInicio').valueChanges.subscribe(value => {
+            if (value) {
+                this.vacationsFormGroup.get('fechaFinal').setValidators([
+                    this.minDateValidator(value)
+                ]);
+                this.vacationsFormGroup.get('fechaFinal').updateValueAndValidity();
+            }
+        });
+    }
 
-  vacaciones: VacacionesRequest = new VacacionesRequest();
+    createFormGroupVacations(initialValues: any) {
+        return new FormGroup({
+            fechaInicio: new FormControl(initialValues.fechaInicio, Validators.required),
+            fechaFinal: new FormControl(initialValues.fechaFinal, Validators.required),
+            descripcion: new FormControl(initialValues.descripcion),
+        });
+    }
 
-  listVacaciones : VacacionesResponse[]  = [];
+    openNew() {
+        this.vacationsFormGroup.reset()
+        this.vacaciones = new VacacionesRequest()
+        this.vacacionesDialog = true
+    }
 
-  constructor(private vacacionesService: VacacionesService) {
-  }
+    crearSolicitudVacaciones() {
+        if (!this.vacationsFormGroup.valid) {
+            this.vacationsFormGroup.markAllAsTouched()
+            return;
+        }
 
-  ngOnInit() {
-    this.vacacionesService.obtenerVacaiones(this.idDivision).subscribe(data =>
-    this.listVacaciones = data);
-  }
+        let vacacionesRequest = this.formGroupToEntity();
+        this.vacacionesService.registrarVacaciones(vacacionesRequest)
+            .pipe(
+                switchMap(() => this.vacacionesService.obtenerVacaiones()),
+                catchError(() => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Ha ocurrido un error al crear la división. Por favor, inténtelo de nuevo.'
+                    });
+                    return of(null);
+                }),
+                finalize(() => {
+                    this.loading = false;
+                })
+            )
+            .subscribe(data => {
+                if (data !== null) {
+                    this.vacacionesResponse = data;
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Creación',
+                        detail: 'Registro creado exitosamente.!'
+                    });
+                    this.vacacionesDialog = false;
+                }
+            });
 
-  openNew(){
-    this.vacacionesDialog = true
-  }
+    }
 
-  solicitudVacaciones(){
+    formGroupToEntity() {
+        const vacacionesRequest: VacacionesRequest = {
+            fechaInicio: format(new Date(this.vacationsFormGroup.get('fechaInicio').value), 'yyyy-MM-dd'),
+            fechaFinal: format(new Date(this.vacationsFormGroup.get('fechaFinal').value), 'yyyy-MM-dd'),
+            descripcion: this.vacationsFormGroup.get('descripcion').value,
+            empleado: null
+        };
+        return vacacionesRequest;
+    }
 
-    this.vacaciones.empleado = '70349ae4-32e5-4a3c-af66-82832911b466';
-    this.fechaInicio= format(new Date(this.vacaciones.fechaInicio), 'yyyy-MM-dd');
-    this.fechaFinal= format(new Date(this.vacaciones.fechaFinal), 'yyyy-MM-dd');
+    oculatarDialog() {
+        this.vacacionesDialog = false;
 
-    this.vacaciones.fechaInicio= this.fechaInicio;
-    this.vacaciones.fechaFinal= this.fechaFinal;
+    }
 
-    this.vacacionesService.registrarVacaciones(this.vacaciones).pipe(switchMap(() => {
-      return this.vacacionesService.obtenerVacaiones('b5691c3c-ecce-47af-8e9c-dd7a946bdbdc');
-    })).subscribe(data => this.listVacaciones = data);
+    verEstado(vacaciones: VacacionesResponse) {
+        this.estadoDialog = true;
+        this.estados = vacaciones.vacacionesTracking
+    }
 
-  }
-
-  oculatarDialog(){
-    this.vacacionesDialog = false;
-
-  }
-
-  verEstado(vacaciones: VacacionesResponse) {
-    this.estadoDialog = true;
-    this.estados = vacaciones.vacacionesTracking
-  }
+    // Validador personalizado para establecer la fecha mínima
+    minDateValidator(startDate: Date) {
+        return (control) => {
+            const endDate = control.value;
+            return endDate && endDate < startDate ? { minDate: true } : null;
+        };
+    }
 
 }

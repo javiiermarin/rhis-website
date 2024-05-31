@@ -15,12 +15,9 @@ export class VacacionesService {
 
   constructor(private http: HttpClient) { }
 
-  obtenerVacaiones(idDivision: string) {
-    let params = new HttpParams();
-    params = params.set('idDivision',idDivision);
-
+  obtenerVacaiones() {
     const url = `${environment.HOST}/rhis/vacaciones`
-    return this.http.get<VacacionesResponse[]>(url, {params: params});
+    return this.http.get<VacacionesResponse[]>(url);
   }
 
   registrarVacaciones(vacacionesRequest: VacacionesRequest){

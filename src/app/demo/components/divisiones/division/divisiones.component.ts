@@ -4,137 +4,227 @@ import {MessageService} from "primeng/api";
 import {Table} from "primeng/table";
 import {DivisionService} from "../../../service/division.service";
 import {DivisionRequest} from "../../../api/divisionRequest";
-import {switchMap} from "rxjs";
+import {catchError, finalize, forkJoin, of, switchMap} from "rxjs";
 import {DivisionResponse} from "../../../api/divisionResponse";
 import {EmpleadoService} from "../../../service/empleado.service";
 import {EmpleadoResponse} from "../../../api/empleadoResponse";
-import {AutoCompleteCompleteEvent} from "primeng/autocomplete";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {map} from "rxjs/operators";
 
 @Component({
-  selector: 'app-divisiones',
-  providers: [MessageService],
-  templateUrl: './divisiones.component.html',
-  styleUrl: './divisiones.component.scss'
+    selector: 'app-divisiones',
+    providers: [MessageService],
+    templateUrl: './divisiones.component.html',
+    styleUrl: './divisiones.component.scss'
 })
-export class DivisionesComponent implements OnInit{
+export class DivisionesComponent implements OnInit {
 
-  productDialog: boolean = false;
+    divisionDialog: boolean = false;
+    deleteProductDialog: boolean = false;
+    empleados: EmpleadoResponse [] = [];
+    selectedEmpleado: EmpleadoResponse = new EmpleadoResponse();
+    divisionResponse: DivisionResponse [] = [];
+    product: Product = {};
+    isEdit: boolean = false;
+    division: DivisionResponse = new DivisionResponse();
+    divisionRequest: DivisionRequest = new DivisionRequest();
+    selectedDivision: [] = [];
+    filteredCountries: EmpleadoResponse [] | undefined;
+    submitted: boolean = false;
+    statuses: any[] = [];
+    divisionFormGroup: FormGroup;
+    loading: boolean = false;
 
-  deleteProductDialog: boolean = false;
+    constructor(
+        private messageService: MessageService,
+        private divisionService: DivisionService,
+        private empleadoService: EmpleadoService) {
+    }
 
-  empleados: EmpleadoResponse [] = [];
+    ngOnInit() {
+        this.divisionFormGroupInit();
+        this.getAllDivisiones()
+        this.empleadoService.obtenerEmpleados().subscribe(data => {
+            this.empleados = data.map(em => ({
+                ...em,
+                fullName: em.nombres + ' ' + em.apellidos
+            }));
+        });
+    }
 
-  selectedEmpleado: EmpleadoResponse = new EmpleadoResponse();
+    getAllDivisiones() {
+        this.divisionService.obtenerDivisiones().pipe(
+            switchMap((data: DivisionResponse[]) => {
+                this.divisionResponse = data;
 
-  divisionResponse:  DivisionResponse [] = [];
+                // Crear un array de observables para obtener los nombres de los encargados
+                const empleadoObservables = data.map(division => {
+                    if (division.encargado) {
+                        // Si el encargado no es nulo, realizar la petición para obtener el nombre del encargado
+                        return this.empleadoService.getOne(division.encargado).pipe(
+                            map(empleado => ({
+                                ...division,
+                                nombreEncargado: empleado.nombres + ' ' + empleado.apellidos // Aquí concatenamos el nombre completo del encargado
+                            }))
+                        );
+                    } else {
+                        // Si el encargado es nulo, devolver directamente la división con nombreEncargado vacío
+                        return of({
+                            ...division,
+                            nombreEncargado: '' // O algún valor predeterminado si prefieres
+                        });
+                    }
+                });
 
-  product: Product = {};
-  
-  isEdit: boolean = false;
+                // Utilizar forkJoin para esperar a que todas las peticiones de empleado se completen
+                return forkJoin(empleadoObservables);
+            })
+        ).subscribe((divisionesConNombres) => {
+            this.divisionResponse = divisionesConNombres;
+        });
+    }
 
-  division: DivisionResponse = new DivisionResponse();
+    divisionFormGroupInit() {
+        this.divisionFormGroup = this.createFormGroupVacations({
+            idDivision: null,
+            nombre: null,
+            encargado: null,
+            enabled: true
+        })
+    }
 
-  divisionRequest: DivisionRequest = new DivisionRequest();
+    createFormGroupVacations(initialValues: any) {
+        return new FormGroup({
+            idDivision: new FormControl(initialValues.idDivision),
+            nombre: new FormControl(initialValues.nombre, Validators.required),
+            encargado: new FormControl(initialValues.encargado, Validators.required),
+            enabled: new FormControl(initialValues.enabled),
+        });
+    }
 
-  selectedDivision: [] = [];
-
-  filteredCountries: EmpleadoResponse [] | undefined;
-
-  submitted: boolean = false;
-
-  statuses: any[] = [];
-
-  constructor(
-              private messageService: MessageService,
-              private divisionService: DivisionService,
-              private empleadoService: EmpleadoService) { }
-
-  ngOnInit() {
-    this.divisionService.obtenerDivisiones().subscribe(data => {
-      this.divisionResponse=data
-    });
-    this.empleadoService.obtenerEmpleados().subscribe(data => {
-      this.empleados = data;
-    })
-
-  }
-
-  openNew() {
-    this.divisionRequest = new DivisionRequest();
-    this.productDialog = true;
-    this.isEdit=false;
-    this.division = new DivisionResponse();
-  }
+    openNew() {
+        this.divisionFormGroup.reset()
+        this.divisionFormGroup.get('enabled').setValue(true);
+        this.divisionDialog = true;
+        this.isEdit = false;
+    }
 
 
-  editDivision(divisionResponse: DivisionResponse)
-  {
-    this.division = { ...divisionResponse };
-    this.productDialog = true;
-    this.isEdit = true;
-  }
+    editDivision(divisionResponse: DivisionResponse) {
+        this.divisionFormGroup = this.createFormGroupVacations(divisionResponse)
+        this.divisionDialog = true;
+        this.isEdit = true;
+    }
 
-  editarDivision(){
-
-    let divisionRequest = new DivisionRequest();
-
-    divisionRequest.encargado = this.selectedEmpleado.idEmpleado;
-    divisionRequest.idDivision = this.division.idDivision;
-    divisionRequest.nombre = this.division.nombre;
-    divisionRequest.isEnabled = this.division.isEnabled;
-
-    this.divisionService.actualizarDivision(divisionRequest).pipe(switchMap(() => {
-      return this.divisionService.obtenerDivisiones()
-    })).subscribe(data => this.divisionResponse=data);
-    this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-
-    this.divisionResponse = [...this.divisionResponse];
-    this.productDialog = false;
-    this.divisionRequest = new DivisionRequest();
-  }
-
-  deleteDivision(divisionResponse: DivisionResponse) {
-    this.deleteProductDialog = true;
-    this.division = { ...divisionResponse };
-  }
-
-  confirmDelete() {
-    this.divisionService.eliminarDivision(this.division.idDivision).pipe(switchMap (() => {
-      return this.divisionService.obtenerDivisiones();
-    })).subscribe(data => this.divisionResponse=data)
-    this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-    this.deleteProductDialog = false;
-  }
-
-  hideDialog() {
-    this.productDialog = false;
-    this.submitted = false;
-  }
-
-  saveDivision() {
-        this.divisionRequest.encargado = this.selectedEmpleado.idEmpleado;
-        this.divisionRequest.nombre = this.division.nombre;
-        this.divisionRequest.isEnabled = this.division.isEnabled;
-    
-        this.divisionService.crearDivision(this.divisionRequest).pipe(switchMap(() => {
-          return this.divisionService.obtenerDivisiones()
-        })).subscribe(data => this.divisionResponse=data);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Dividion Creada', life: 3000 });
-
-        this.divisionResponse = [...this.divisionResponse];
-        this.productDialog = false;
-        this.divisionRequest = new DivisionRequest();
+    editarDivision() {
+        const divisionRequest = this.formGroupToEntity()
+        this.divisionService.actualizarDivision(divisionRequest)
+            .pipe(
+                switchMap(() => this.divisionService.obtenerDivisiones()),
+                switchMap((data: DivisionResponse[]) => {
+                    this.divisionResponse = data;
+                    // Crear un array de observables para obtener los nombres de los encargados
+                    const empleadoObservables = data.map(division => {
+                        if (division.encargado) {
+                            // Si el encargado no es nulo, realizar la petición para obtener el nombre del encargado
+                            return this.empleadoService.getOne(division.encargado).pipe(
+                                map(empleado => ({
+                                    ...division,
+                                    nombreEncargado: empleado.nombres + ' ' + empleado.apellidos
+                                }))
+                            );
+                        } else {
+                            // Si el encargado es nulo, devolver directamente la división con nombreEncargado vacío
+                            return of({
+                                ...division,
+                                nombreEncargado: '' // O algún valor predeterminado si prefieres
+                            });
+                        }
+                    });
+                    // Utilizar forkJoin para esperar a que todas las peticiones de empleado se completen
+                    return forkJoin(empleadoObservables);
+                }),
+                catchError(() => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Ha ocurrido un error al actualizar la división. Por favor, inténtelo de nuevo.'
+                    });
+                    return of([]);
+                }),
+                finalize(() => {
+                    this.loading = false;
+                })
+            )
+            .subscribe((divisionesConNombres) => {
+                this.divisionResponse = divisionesConNombres;
+                if (divisionesConNombres.length > 0) {
+                    this.messageService.add({
+                        severity: 'info',
+                        summary: 'Actualización',
+                        detail: 'Registro actualizado exitosamente!'
+                    });
+                    this.divisionDialog = false;
+                }
+            });
 
     }
 
-  onGlobalFilter(table: Table, event: Event) {
-    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
+    hideDialog() {
+        this.divisionDialog = false;
+        this.submitted = false;
+    }
+
+    saveDivision() {
+        if (!this.divisionFormGroup.valid) {
+            this.divisionFormGroup.markAllAsTouched()
+            return;
+        }
+        const divisionRequest = this.formGroupToEntity()
+        this.divisionService.crearDivision(divisionRequest)
+            .pipe(
+                switchMap(() => this.divisionService.obtenerDivisiones()),
+                catchError(() => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Ha ocurrido un error al crear la división. Por favor, inténtelo de nuevo.'
+                    });
+                    return of(null);
+                }),
+                finalize(() => {
+                    this.loading = false;
+                })
+            )
+            .subscribe(data => {
+                if (data !== null) {
+                    this.divisionResponse = data;
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Creación',
+                        detail: 'Registro creado exitosamente.!'
+                    });
+                    this.divisionDialog = false;
+                }
+            });
+    }
+
+    formGroupToEntity() {
+        const divisionRequest: DivisionRequest = {
+            idDivision: this.divisionFormGroup.get('idDivision').value,
+            nombre: this.divisionFormGroup.get('nombre').value,
+            enabled: this.divisionFormGroup.get('enabled').value,
+            encargado: this.divisionFormGroup.get('encargado').value,
+        };
+        return divisionRequest;
+    }
+
+    onGlobalFilter(table: Table, event: Event) {
+        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    }
 
 
-
-
-  }
+}
 
 
 

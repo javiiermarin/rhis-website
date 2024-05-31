@@ -5,47 +5,54 @@
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
-                        <button pButton pRipple label="Crear" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()" ></button>
+                        <button pButton pRipple label="Crear" icon="pi pi-plus" class="p-button-success mr-2"
+                                (click)="openNew()"></button>
                     </div>
                 </ng-template>
 
             </p-toolbar>
 
-            <p-table #dt [value]="divisionResponse"  responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['nombre','encargado','isEnabled']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} entries" [(selection)]="selectedDivision" selectionMode="multiple" [rowHover]="true" dataKey="idDivision">
+            <p-table #dt [value]="divisionResponse" responsiveLayout="scroll" [rows]="10"
+                     [globalFilterFields]="['nombre','nombreEncargado']" [paginator]="true"
+                     [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} entries"
+                     [(selection)]="selectedDivision" selectionMode="multiple" [rowHover]="true" dataKey="idDivision">
                 <ng-template pTemplate="caption">
                     <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                         <h3 class="m-0">Administrar Divisiones</h3>
                         <span class="block mt-2 md:mt-0 p-input-icon-left">
                             <i class="pi pi-search"></i>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscando..."  class="w-full sm:w-auto"/>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscando..."
+                                   class="w-full sm:w-auto"/>
                         </span>
                     </div>
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon></th>
-                        <th pSortableColumn="encargado">Encargado <p-sortIcon field="encargado"></p-sortIcon></th>
-                        <th pSortableColumn="isEnabled">Estado <p-sortIcon field="isEnabled"></p-sortIcon></th>
+                        <th>Nombre</th>
+                        <th>Encargado</th>
+                        <th>Estado</th>
                         <th></th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-divisionResponse>
                     <tr>
-                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">Nombre</span>
-                            {{divisionResponse.nombre}}
+                        <td><span class="p-column-title">Nombre</span>
+                            {{ divisionResponse.nombre }}
                         </td>
-                        <td style="width:14%; min-width:10rem;">
+                        <td>
                             <span class="p-column-title">Encargado</span>
-                            {{divisionResponse.encargado.nombres}}
+                            {{ divisionResponse.nombreEncargado }}
                         </td>
-                        <td style="width:14%; min-width:10rem;">
-                            <span class="p-column-title">Estado</span>
-                            {{divisionResponse.isEnabled}}
+                        <td>
+                            <p-badge value="Activo" severity="success" *ngIf="divisionResponse.enabled"></p-badge>
+                            <p-badge value="Inactivo" severity="danger" *ngIf="!divisionResponse.enabled"></p-badge>
                         </td>
                         <td>
                             <div class="flex">
-                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editDivision(divisionResponse)"></button>
-                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteDivision(divisionResponse)"></button>
+                                <button pButton pRipple icon="pi pi-pencil"
+                                        class="p-button-rounded p-button-success mr-2"
+                                        (click)="editDivision(divisionResponse)"></button>
                             </div>
                         </td>
                     </tr>
@@ -53,41 +60,46 @@
             </p-table>
         </div>
 
-        <p-dialog [(visible)]="productDialog" [style]="{width: '450px'}" header="Divisiones" [modal]="true" class="p-fluid">
-            <ng-template pTemplate="content">
-                <div class="field">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" pInputText id="nombre" [(ngModel)]="division.nombre"  [ngClass]="{'ng-invalid ng-dirty' : submitted && !division.nombre}"/>
-                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !division.nombre">Nombre obligatorio.</small>
+        <p-dialog [(visible)]="divisionDialog" [style]="{width: '450px'}" header="Divisiones" [modal]="true">
+            <form [formGroup]="divisionFormGroup">
+                <div class="grid p-fluid">
+                    <div class="col-12 md:col-12">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" pInputText placeholder="Nombre de la divisón" id="nombre"
+                               formControlName="nombre"/>
+                        <div
+                                *ngIf="divisionFormGroup.controls.nombre.invalid && (divisionFormGroup.controls.nombre.dirty || divisionFormGroup.controls.nombre.touched)"
+                                class="p-error">
+                            <small *ngIf="divisionFormGroup.controls.nombre.errors.required">El nombre es requerido.</small>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-12">
+                        <p-dropdown id="puesto" [autoDisplayFirst]="false" [options]="empleados"
+                                    placeholder="Selecciona un puesto"
+                                    formControlName="encargado"
+                                    appendTo="body"
+                                    optionLabel="fullName" optionValue="idEmpleado"></p-dropdown>
+                        <div
+                                *ngIf="divisionFormGroup.controls.encargado.invalid && (divisionFormGroup.controls.encargado.dirty || divisionFormGroup.controls.encargado.touched)"
+                                class="p-error">
+                            <small *ngIf="divisionFormGroup.controls.encargado.errors.required">El encargado es requerido.</small>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <h6>Estado</h6>
+                        <p-inputSwitch formControlName="enabled"></p-inputSwitch>
+                    </div>
                 </div>
-                <div class="field">
-                    <p-dropdown
-                            [options]="empleados"
-                            [(ngModel)]="selectedEmpleado"
-                            placeholder="Selecciona un encargado"
-                            [editable]="true"
-                            appendTo="body"
-                            optionLabel="nombres" />
-                </div>
-            </ng-template>
+            </form>
             <ng-template pTemplate="footer">
-                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-                <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveDivision()"></button>
-                <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text" (click)="editarDivision()"></button>
-
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                        (click)="hideDialog()"></button>
+                <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+                        (click)="saveDivision()"></button>
+                <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text"
+                        (click)="editarDivision()"></button>
             </ng-template>
         </p-dialog>
-        <p-dialog [(visible)]="deleteProductDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
-            <div class="flex align-items-center justify-content-center">
-                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-                <span *ngIf="division">Quieres borrar .. <b>{{division.nombre}}</b>?</span>
-            </div>
-            <ng-template pTemplate="footer">
-                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProductDialog = false"></button>
-                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Si" (click)="confirmDelete()"></button>
-            </ng-template>
-        </p-dialog>
-
     </div>
 </div>
 

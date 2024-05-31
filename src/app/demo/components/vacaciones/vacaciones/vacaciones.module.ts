@@ -10,7 +10,7 @@ import {RippleModule} from "primeng/ripple";
 import {TableModule} from "primeng/table";
 import {DialogModule} from "primeng/dialog";
 import {CalendarModule} from "primeng/calendar";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {InputTextareaModule} from "primeng/inputtextarea";
 import {BadgeModule} from "primeng/badge";
 
@@ -24,7 +24,6 @@ import {BadgeModule} from "primeng/badge";
         VacacionesRoutingModule,
         ToastModule,
         ToolbarModule,
-        ɵEmptyOutletComponent,
         ButtonModule,
         RippleModule,
         TableModule,
@@ -33,6 +32,7 @@ import {BadgeModule} from "primeng/badge";
         FormsModule,
         InputTextareaModule,
         BadgeModule,
+        ReactiveFormsModule,
     ]
 })
 export class VacacionesModule { }

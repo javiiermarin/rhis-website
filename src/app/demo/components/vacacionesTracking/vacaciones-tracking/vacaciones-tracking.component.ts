@@ -39,26 +39,20 @@ import {VacacionesTrackingRequest} from "../../../api/vacacionesTrackingRequest"
 export class VacacionesTrackingComponent implements OnInit{
 
   idDivision: string= 'b5691c3c-ecce-47af-8e9c-dd7a946bdbdc';
-
   estados: VacacionesTrackingResponse [] = [];
-
   fechaMinima: Date = new Date();
-
   fechaInicio: string;
   fechaFinal: string;
-
   vacacionesDialog: boolean= false;
   estadoDialog: boolean = false;
-
   vacaciones: VacacionesRequest = new VacacionesRequest();
-
   listVacaciones : VacacionesResponse[]  = [];
 
   constructor(private vacacionesService: VacacionesService) {
   }
 
   ngOnInit() {
-    this.vacacionesService.obtenerVacaiones(this.idDivision).subscribe(data => {
+    this.vacacionesService.obtenerVacaiones().subscribe(data => {
       this.listVacaciones = data;
     })
 
@@ -78,7 +72,7 @@ export class VacacionesTrackingComponent implements OnInit{
     this.vacaciones.fechaFinal= this.fechaFinal;
 
     this.vacacionesService.registrarVacaciones(this.vacaciones).pipe(switchMap(() => {
-      return this.vacacionesService.obtenerVacaiones('b5691c3c-ecce-47af-8e9c-dd7a946bdbdc');
+      return this.vacacionesService.obtenerVacaiones();
     })).subscribe(data => this.listVacaciones = data);
 
   }
@@ -115,7 +109,7 @@ export class VacacionesTrackingComponent implements OnInit{
     });
 
     this.vacacionesService.modificarVacaciones(this.vacaciones).pipe(switchMap(() => {
-      return this.vacacionesService.obtenerVacaiones(this.idDivision);
+      return this.vacacionesService.obtenerVacaiones();
     })).subscribe( data => this.listVacaciones = data);
 
     this.estadoDialog = false;
