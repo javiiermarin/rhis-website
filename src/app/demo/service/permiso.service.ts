@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PermisoResponse} from "../api/permisoResponse";
+import {PermisoRequest} from "../api/permisoRequest";
 
 @Injectable({
   providedIn: 'root'
@@ -18,5 +19,10 @@ export class PermisoService {
 
     const url: string = `${environment.HOST}/rhis/permisos`;
     return this.http.get<PermisoResponse[]>(url, {params: params});
+  }
+
+  registrarPermiso(permisoRequest: PermisoRequest){
+    return this.http.post(this.url, permisoRequest);
+
   }
 }
