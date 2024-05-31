@@ -1,1 +1,60 @@
-<p>planilla works!</p>
+<div class="grid">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-4">
+            <div class="my-2">
+                <div class="col-12 mb-2 lg:col-10 lg:mb-0">
+                    <label>Fecha Inicio</label>
+                <p-calendar placeholder="Fecha Inicio" appendTo="body" [(ngModel)]="planillaRequest.fechaInicio"></p-calendar>
+                </div>
+            </div>
+            <div class="my-2">
+                <div class="col-12 mb-2 lg:col-10 lg:mb-0">
+                    <label>Fecha Final</label>
+                    <p-calendar placeholder="Fecha Final" appendTo="body" [(ngModel)]="planillaRequest.fechaFinal"></p-calendar>
+                </div>
+            </div>
+            <div class="my-2">
+                <div class="col-12 mb-2 lg:col-10 lg:mb-0">
+                    <button pButton pRipple label="Generar Planilla" class="p-button-success" (click)="generarPlanilla(planillaRequest)"></button>
+                </div>
+            </div>
+        </p-toolbar>
+
+        <p-table [value]="lstPagoPlanilla">
+            <ng-template pTemplate="caption">
+                <div class="flex">
+                    <h3>Planilla</h3>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Empleado</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Final</th>
+                    <th>Sueldo Base</th>
+                    <th>Salario Neto</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-planilla>
+                <tr>
+                    <td>
+                        {{planilla.empleado.nombres}}
+                    </td>
+                    <td>
+                        {{planilla.fechaInicio}}
+                    </td>
+                    <td>
+                        {{planilla.fechaFinal}}
+                    </td>
+                    <td>
+                        {{planilla.sueldoBase | currency: "Q"}}
+                    </td>
+                    <td>
+                        {{planilla.salarioNeto | currency: "Q"}}
+                    </td>
+                </tr>
+            </ng-template>
+
+        </p-table>
+    </div>
+</div>

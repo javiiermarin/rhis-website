@@ -12,6 +12,7 @@ import {DropdownModule} from "primeng/dropdown";
 import {CalendarModule} from "primeng/calendar";
 import {InputTextareaModule} from "primeng/inputtextarea";
 import {FormsModule} from "@angular/forms";
+import {BadgeModule} from "primeng/badge";
 
 
 
@@ -19,19 +20,20 @@ import {FormsModule} from "@angular/forms";
   declarations: [
       PermisosComponent
   ],
-  imports: [
-    CommonModule,
-    PermisosRoutingModule,
-    ToolbarModule,
-    SharedModule,
-    ButtonModule,
-    RippleModule,
-    TableModule,
-    DialogModule,
-    DropdownModule,
-    CalendarModule,
-    InputTextareaModule,
-    FormsModule
-  ]
+    imports: [
+        CommonModule,
+        PermisosRoutingModule,
+        ToolbarModule,
+        SharedModule,
+        ButtonModule,
+        RippleModule,
+        TableModule,
+        DialogModule,
+        DropdownModule,
+        CalendarModule,
+        InputTextareaModule,
+        FormsModule,
+        BadgeModule
+    ]
 })
 export class PermisosModule { }

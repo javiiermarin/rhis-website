@@ -4,5 +4,5 @@ export class VacacionesTrackingResponse{
 
     idVacacionesTracking: string;
     estado: boolean;
-    empledo: EmpleadoResponse = new EmpleadoResponse();
+    empleado: EmpleadoResponse = new EmpleadoResponse();
 }

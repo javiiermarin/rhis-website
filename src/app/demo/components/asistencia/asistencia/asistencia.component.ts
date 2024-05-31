@@ -49,6 +49,8 @@ export class AsistenciaComponent  implements OnInit{
     this.marcacionesRandomService.listarMarcacionesRandom().subscribe(data => this.lstMarcacionesRandom = data);
     this.horasExtrasService.obtenerHorasExtras().subscribe(data => this.lstHorasExtras = data);
   }
+
+
   mostrar(){
   }
 
