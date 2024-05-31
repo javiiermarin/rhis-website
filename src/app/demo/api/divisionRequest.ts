@@ -1,8 +1,8 @@
-export class DivisionRequest{
+export class DivisionRequest {
 
-    idDivision : string;
-    nombre : string;
-    isEnabled : boolean;
+    idDivision: string;
+    nombre: string;
+    enabled: boolean;
     encargado: string;
 
 }

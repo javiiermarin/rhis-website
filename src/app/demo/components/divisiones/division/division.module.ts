@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { DivisionRoutingModule } from './division-routing.module';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {DivisionRoutingModule} from './division-routing.module';
 import {DivisionesComponent} from "./divisiones.component";
-import { TableModule } from 'primeng/table';
+import {TableModule} from 'primeng/table';
 import {ToastModule} from "primeng/toast";
 import {ButtonModule} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
@@ -16,8 +16,9 @@ import {RatingModule} from "primeng/rating";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RippleModule} from "primeng/ripple";
 import {ToolbarModule} from "primeng/toolbar";
-import { AutoCompleteModule } from 'primeng/autocomplete';
-
+import {AutoCompleteModule} from 'primeng/autocomplete';
+import {BadgeModule} from "primeng/badge";
+import {InputSwitchModule} from "primeng/inputswitch";
 
 
 @NgModule({
@@ -45,7 +46,10 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
         RippleModule,
         ToolbarModule,
         FormsModule,
-        AutoCompleteModule
+        AutoCompleteModule,
+        BadgeModule,
+        InputSwitchModule
     ]
 })
-export class DivisionModule { }
+export class DivisionModule {
+}

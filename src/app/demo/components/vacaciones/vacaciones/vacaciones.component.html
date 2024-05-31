@@ -1,19 +1,20 @@
 <div class="grid">
     <div class="col-12">
         <div class="card px-6 py-6">
-            <!--<p-toast></p-toast>-->
+            <p-toast></p-toast>
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
-                        <button pButton pRipple label="Solicitar Vacaciones" icon="pi pi-plus" class="p-button-success" (click)="openNew()"></button>
+                        <button pButton pRipple label="Solicitar Vacaciones" icon="pi pi-plus" class="p-button-success"
+                                (click)="openNew()"></button>
                     </div>
                 </ng-template>
             </p-toolbar>
 
-            <p-table #dt [value]="listVacaciones" responsiveLayout="scroll" [rows]="10" [rowHover]="true">
+            <p-table #dt [value]="vacacionesResponse" responsiveLayout="scroll" [rows]="10" [rowHover]="true">
                 <ng-template pTemplate="caption">
                     <div class="flex flex-column md:flex-row md:justify-content-between">
-                       <h3>Mis Vacaciones</h3>
+                        <h3>Mis Vacaciones</h3>
                     </div>
                 </ng-template>
                 <ng-template pTemplate="header">
@@ -22,80 +23,104 @@
                         <th>Descripcion</th>
                         <th>Fecha Inicio</th>
                         <th>Fecha Final</th>
+                        <th></th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-xx>
+                <ng-template pTemplate="body" let-vacacion>
                     <tr>
                         <td>
-                            {{xx.fechaSolicitud | date: 'dd-MM-yyyy hh:mm a'}}
-                        </td>
-                    <td>
-                            {{xx.descripcion}}
-                    </td>
-                        <td>
-                            {{xx.fechaInicio}}
+                            {{ vacacion.fechaSolicitud | date: 'dd-MM-yyyy hh:mm a' }}
                         </td>
                         <td>
-                            {{xx.fechaFinal}}
+                            {{ vacacion.descripcion }}
+                        </td>
+                        <td>
+                            {{ vacacion.fechaInicio }}
+                        </td>
+                        <td>
+                            {{ vacacion.fechaFinal }}
                         </td>
                         <td>
                             <div class="flex">
-                                <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" (click)="verEstado(xx)"></button>
+                                <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2"
+                                        (click)="verEstado(vacacion)"></button>
                             </div>
                         </td>
                     </tr>
                 </ng-template>
             </p-table>
         </div>
-
-        <p-dialog [(visible)]="estadoDialog" [style]="{width:'650px'}" header="Estado de mis vacaciones" [modal]="true">
-            <p-table [value]="estados">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Estado</th>
-                        <th>Verificacion</th>
-                        <th>Division</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-vacaciones>
-                    <tr>
-                        <td>
-                            <p-badge value="Aprobado" severity="success" *ngIf="vacaciones.estado"></p-badge>
-                            <p-badge value="No aprobado" severity="danger" *ngIf="!vacaciones.estado"></p-badge>
-
-                        </td>
-                        <td>
-                            {{vacaciones.empleado.nombres}}
-                        </td>
-                        <td>
-                        {{vacaciones.empleado.puesto.nombre}}
-                        </td>
-                    </tr>
-
-                </ng-template>
-            </p-table>
-
-        </p-dialog>
-
-        <p-dialog [(visible)]="vacacionesDialog" [style]="{width:'500px'}" header="Solicitar vacaciones" [modal]="true">
-            <ng-template pTemplate="content">
-                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
-                    <label>Fecha Inicio</label>
-                    <p-calendar appendTo="body" [minDate]="fechaMinima"  [(ngModel)]="vacaciones.fechaInicio"/>
-                </div>
-                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
-                    <label>Fecha Final</label>
-                    <p-calendar appendTo="body" [minDate]="fechaMinima" [(ngModel)]="vacaciones.fechaFinal"></p-calendar>
-                </div>
-                <div class="col-12 mb-2 lg:col-5 lg:mb-0">
-                    <label for="descripcion">Descripcion</label>
-                    <textarea id="descripcion" pInputTextarea [(ngModel)]="vacaciones.descripcion"></textarea>
-                </div>
-            </ng-template>
-            <ng-template pTemplate="footer">
-                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="oculatarDialog()"></button>
-                <button pButton pRipple label="Crear" icon="pi pi-check" class="p-button-text" (click)="solicitudVacaciones()"></button>
-            </ng-template>
-        </p-dialog>
     </div>
 </div>
+
+<p-dialog [(visible)]="estadoDialog" [style]="{width:'650px'}" header="Estado de mis vacaciones" [modal]="true">
+    <p-table [value]="estados">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Estado</th>
+                <th>Verificacion</th>
+                <th>Division</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-vacaciones>
+            <tr>
+                <td>
+                    <p-badge value="Aprobado" severity="success" *ngIf="vacaciones.estado"></p-badge>
+                    <p-badge value="No aprobado" severity="danger" *ngIf="!vacaciones.estado"></p-badge>
+
+                </td>
+                <td>
+                    {{ vacaciones.empleado.nombres }}
+                </td>
+                <td>
+                    {{ vacaciones.empleado.puesto.nombre }}
+                </td>
+            </tr>
+
+        </ng-template>
+    </p-table>
+
+</p-dialog>
+
+<p-dialog [(visible)]="vacacionesDialog" [style]="{width:'500px'}" header="Solicitar vacaciones" [modal]="true">
+    <form [formGroup]="vacationsFormGroup">
+        <div class="grid p-fluid">
+            <div class="col-12 md:col-6">
+                <label for="fechaInicio">Fecha Inicio</label>
+                <p-calendar id="fechaInicio" appendTo="body" dateFormat="dd-mm-yy" [minDate]="fechaMinima"
+                            formControlName="fechaInicio"/>
+                <div
+                        *ngIf="vacationsFormGroup.controls.fechaInicio.invalid && (vacationsFormGroup.controls.fechaInicio.dirty || vacationsFormGroup.controls.fechaInicio.touched)"
+                        class="p-error">
+                    <small *ngIf="vacationsFormGroup.controls.fechaInicio.errors.required">La fecha de inicio es
+                        requerida.</small>
+                </div>
+            </div>
+            <div class="col-12 md:col-6">
+                <label for="fechaFinal">Fecha Final</label>
+                <p-calendar id="fechaFinal" appendTo="body" dateFormat="dd-mm-yy" [minDate]="fechaFinalMinima"
+                            formControlName="fechaFinal"></p-calendar>
+                <div
+                        *ngIf="vacationsFormGroup.controls.fechaFinal.invalid && (vacationsFormGroup.controls.fechaFinal.dirty || vacationsFormGroup.controls.fechaFinal.touched)"
+                        class="p-error">
+                    <small *ngIf="vacationsFormGroup.controls.fechaFinal.errors.required">La fecha de final es
+                        requerida.</small>
+                </div>
+                <div *ngIf="vacationsFormGroup.get('fechaFinal').hasError('minDate')" class="p-error">
+                    <small >La fecha de final no debe ser menor a la fecha de inicio.</small>
+                </div>
+            </div>
+            <div class="col-12 md:col-12">
+                <label for="descripcion">Descripcion</label>
+                <textarea id="descripcion" rows="5" cols="30" style="resize: none" pInputTextarea
+                          formControlName="descripcion"></textarea>
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                (click)="oculatarDialog()"></button>
+        <button pButton pRipple label="Crear" icon="pi pi-check" class="p-button-text"
+                (click)="crearSolicitudVacaciones()"></button>
+    </ng-template>
+</p-dialog>

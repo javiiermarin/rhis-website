@@ -5,51 +5,66 @@
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
-                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                                (click)="openNew()"></button>
                     </div>
                 </ng-template>
             </p-toolbar>
 
-            <p-table #dt [value]="puestosResponse" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['nombre','salarioMaximo','salarioMinimo','division']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando{first} de {last} de {totalRecords} entries" [(selection)]="selectPuesto" selectionMode="multiple" [rowHover]="true" dataKey="idPuesto">
+            <p-table #dt [value]="puestosResponse" responsiveLayout="scroll" [rows]="10"
+                     [globalFilterFields]="['nombre','salarioMaximo','salarioMinimo','division']" [paginator]="true"
+                     [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true"
+                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros"
+                     [(selection)]="selectPuesto" selectionMode="multiple" [rowHover]="true" dataKey="idPuesto">
                 <ng-template pTemplate="caption">
                     <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                         <h3 class="m-0">Administracion de puestos</h3>
                         <span class="block mt-2 md:mt-0 p-input-icon-left">
                             <i class="pi pi-search"></i>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscando..."  class="w-full sm:w-auto"/>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscando..."
+                                   class="w-full sm:w-auto"/>
                         </span>
                     </div>
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"></p-sortIcon></th>
-                        <th pSortableColumn="salario_maixmo">Salario Maximo <p-sortIcon field="salario_maximo"></p-sortIcon></th>
-                        <th pSortableColumn="salario_minimo">Salario Minimo <p-sortIcon field="salario_minimo"></p-sortIcon></th>
-                        <th pSortableColumn="division">Division <p-sortIcon field="division"></p-sortIcon></th>
+                        <th pSortableColumn="nombre">Nombre
+                            <p-sortIcon field="nombre"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="salarioMinimo">Salario Minimo
+                            <p-sortIcon field="salarioMinimo"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="salarioMaximo">Salario Maximo
+                            <p-sortIcon field="salarioMaximo"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="division.nombre">Division
+                            <p-sortIcon field="division"></p-sortIcon>
+                        </th>
                         <th></th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-puestos>
+                <ng-template pTemplate="body" let-puesto>
                     <tr>
-                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">Nombre</span>
-                            {{puestos.nombre}}
+                        <td><span class="p-column-title">Nombre</span>
+                            {{ puesto.nombre }}
                         </td>
-                        <td style="width:14%; min-width:10rem;">
-                            <span class="p-column-title">Salario Maximo</span>
-                            {{puestos.salarioMaximo | currency: 'Q'}}
-                        </td>
-                        <td style="width:14%; min-width:8rem;">
+                        <td>
                             <span class="p-column-title">Salario Minimo</span>
-                            {{puestos.salarioMinimo| currency:'Q'}}
+                            {{ puesto.salarioMinimo| currency:'Q' }}
                         </td>
-                        <td style="width:14%; min-width:10rem;">
+                        <td>
+                            <span class="p-column-title">Salario Maximo</span>
+                            {{ puesto.salarioMaximo | currency: 'Q' }}
+                        </td>
+                        <td>
                             <span class="p-column-title">Division</span>
-                            {{puestos.division.nombre}}
+                            {{ puesto.division.nombre }}
                         </td>
                         <td>
                             <div class="flex">
-                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editPuesto(puestos)"></button>
-                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deletePuesto(puestos)"></button>
+                                <button pButton pRipple icon="pi pi-pencil"
+                                        class="p-button-rounded p-button-success mr-2"
+                                        (click)="editPuesto(puesto)"></button>
                             </div>
                         </td>
                     </tr>
@@ -57,51 +72,69 @@
             </p-table>
         </div>
 
-        <p-dialog [(visible)]="productDialog" [style]="{width: '450px'}" header="Detalles del puesto" [modal]="true" class="p-fluid">
-            <ng-template pTemplate="content">
-                <div class="field">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" pInputText id="nombre" [(ngModel)]="puesto.nombre" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !puesto.nombre}"/>
-                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !puesto.nombre">Nombre obligatorio.</small>
-                </div>
-                <div class="field">
-                    <p-dropdown
-                            [options]="divisionesResponse"
-                            [(ngModel)]="selectedDivision"
-                            placeholder="Selecciona una division"
-                            [editable]="true"
-                            appendTo="body"
-                            optionLabel="nombre" />
-                </div>
-                <div class="formgrid grid">
-                    <div class="field col">
-                        <label for="salario_maximo">Salario Maximo</label>
-                        <p-inputNumber id="salario_maximo" [(ngModel)]="puesto.salarioMaximo"></p-inputNumber>
+        <p-dialog [(visible)]="puestoDialog" [style]="{width: '450px'}" header="Detalles del puesto" [modal]="true"
+                  class="p-fluid">
+            <form [formGroup]="puestoFormGroup">
+                <div class="grid p-fluid">
+                    <div class="col-12 md:col-12">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" pInputText id="nombre" placeholder="Nombre" formControlName="nombre"
+                               required/>
+                        <div
+                                *ngIf="puestoFormGroup.controls.nombre.invalid && (puestoFormGroup.controls.nombre.dirty || puestoFormGroup.controls.nombre.touched)"
+                                class="p-error">
+                            <small *ngIf="puestoFormGroup.controls.nombre.errors.required">El nombre es
+                                requerido.</small>
+                        </div>
                     </div>
-                    <div class="field col">
+                    <div class="col-12 md:col-12">
+                        <p-dropdown id="division" [autoDisplayFirst]="false" [options]="divisionesResponse"
+                                    placeholder="Selecciona un puesto"
+                                    formControlName="idDivision"
+                                    appendTo="body"
+                                    optionLabel="nombre" optionValue="idDivision"></p-dropdown>
+                        <div
+                                *ngIf="puestoFormGroup.controls.idDivision.invalid && (puestoFormGroup.controls.idDivision.dirty || puestoFormGroup.controls.idDivision.touched)"
+                                class="p-error">
+                            <small *ngIf="puestoFormGroup.controls.idDivision.errors.required">La división es
+                                requerida.</small>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
                         <label for="salario_minimo">Salario Minimo</label>
-                        <p-inputNumber id="salario_minimo" [(ngModel)]="puesto.salarioMinimo"></p-inputNumber>
+                        <p-inputNumber id="salario_minimo" formControlName="salarioMinimo"></p-inputNumber>
+                        <div
+                                *ngIf="puestoFormGroup.controls.salarioMinimo.invalid && (puestoFormGroup.controls.salarioMinimo.dirty || puestoFormGroup.controls.salarioMinimo.touched)"
+                                class="p-error">
+                            <small *ngIf="puestoFormGroup.controls.salarioMinimo.errors.required">El salario mínimo es
+                                requerido.</small>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <label for="salario_maximo">Salario Maximo</label>
+                        <p-inputNumber id="salario_maximo" formControlName="salarioMaximo"></p-inputNumber>
+                        <div
+                                *ngIf="puestoFormGroup.controls.salarioMaximo.invalid && (puestoFormGroup.controls.salarioMaximo.dirty || puestoFormGroup.controls.salarioMaximo.touched)"
+                                class="p-error">
+                            <small *ngIf="puestoFormGroup.controls.salarioMaximo.errors.required">El salario máximo es
+                                requerido.</small>
+                            <div *ngIf="puestoFormGroup.get('salarioMaximo').hasError('salarioMaximoMenorQueMinimo')"
+                                 class="p-error">
+                                <small>El salario máximo debe ser igual o mayor al salario mínimo.</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </ng-template>
+            </form>
             <ng-template pTemplate="footer">
-                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-                <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="crearPuesto()"></button>
-                <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text" (click)="editarPuesto()"></button>
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                        (click)="hideDialog()"></button>
+                <button *ngIf="!this.isEdit" pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+                        (click)="crearPuesto()"></button>
+                <button *ngIf="this.isEdit" pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text"
+                        (click)="editarPuesto()"></button>
             </ng-template>
         </p-dialog>
-
-        <p-dialog [(visible)]="deleteProductDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
-            <div class="flex align-items-center justify-content-center">
-                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-                <span *ngIf="product">Estas seguro de que quieres eliminar  <b>{{product.name}}</b>?</span>
-            </div>
-            <ng-template pTemplate="footer">
-                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProductDialog = false"></button>
-                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Si" (click)="confirmDelete()"></button>
-            </ng-template>
-        </p-dialog>
-
     </div>
 </div>
 

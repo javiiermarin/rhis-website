@@ -14,7 +14,7 @@ import {PhotoService} from './demo/service/photo.service';
 import {PanelMenuModule} from 'primeng/panelmenu';
 import {KeycloakAngularModule, KeycloakService} from "keycloak-angular";
 import {initializeKeycloak} from "./init/keycloak-init.factory";
-import {ConfirmationService} from "primeng/api";
+import {ConfirmationService, MessageService} from "primeng/api";
 
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
@@ -28,7 +28,7 @@ import {ConfirmationService} from "primeng/api";
         },
         {provide: LocationStrategy, useClass: PathLocationStrategy},
         CountryService, CustomerService, EventService, IconService, NodeService,
-        PhotoService, ProductService, ConfirmationService
+        PhotoService, ProductService, ConfirmationService, MessageService
     ],
     bootstrap: [AppComponent],
 })
