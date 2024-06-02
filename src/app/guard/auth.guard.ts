@@ -27,7 +27,8 @@ export class AuthGuard extends KeycloakAuthGuard {
         }
 
         // Roles permitidos en el app routing
-        const requiredRoles: string[] = route.data?.['roles'];
+        const requiredRoles: string[] = route.data?.['ro' +
+        'les'];
 
         const hasAccess = this.roles.some(role => requiredRoles.includes(role));
 
