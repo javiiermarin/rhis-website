@@ -4,10 +4,12 @@
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
-                        <button pButton pRipple label="Solicitar un permiso" icon="pi pi-plus" class="p-button-success" (click)=abrirDialog()></button>
+                        <button pButton pRipple label="Solicitar un permiso" icon="pi pi-plus" class="p-button-success"
+                                (click)=abrirDialog()></button>
                     </div>
                 </ng-template>
             </p-toolbar>
+
             <p-table #dt [value]="lstPermisoResponse" responsiveLayout="scroll" [rows]="10" [rowHover]="true">
                 <ng-template pTemplate="caption">
                     <div class="flex flex-column md:flex-row">
@@ -47,7 +49,7 @@
             </p-table>
         </div>
 
-        <p-dialog [(visible)]="estadoDialog" [style]="{width:'650px'}" header="Estado de mis Permisos" [modal]="true">
+        <p-dialog [(visible)]="estadoDialog" [style]="{width:'500px'}" header="Estado de mis Permisos" [modal]="true">
             <p-table [value]="estados">
                 <ng-template pTemplate="header">
                     <tr>
@@ -65,35 +67,55 @@
                         <td>
                             {{permisos.empleado.nombres}}
                         </td>
+                        <td>
+                            {{permisos.empleado.puesto.nombre}}
+                        </td>
 
                     </tr>
                 </ng-template>
-
             </p-table>
 
         </p-dialog>
-
-        <p-dialog [(visible)]="permisosDialog" [style]="{width:'700px'}" header="Solicitar un Permiso" [modal]="true" class="p-fluid">
-            <ng-template pTemplate="content">
-                <div class="col-5 mb-2 lg:col-5 lg:mb-0">
+        <p-dialog [(visible)]="permisosDialog" [style]="{width:'500px'}" header="Solicitar un Permiso" [modal]="true">
+            <form [formGroup]="permisosFormGroup">
+                <div class="grid p-fluid">
+                <div class="col-12 md:col-6">
                     <label>Tipo de permiso</label>
                     <p-dropdown
                             [options]="lstTipoPermisos"
                             optionLabel="nombre"
-                            [(ngModel)]="selectedTipoPermiso"
+                            formControlName="tipoPermiso"
                             emptyFilterMessage="true"
                             placeholder="Selecciona una opcion"
                             [editable]="true"
                             appendTo="body"/>
                 </div>
-                <div class="col-5 mb-2 lg:col-3 lg:mb-0">
-                    <label>Fecha Inicio</label>
-                    <p-calendar appendTo="body" [(ngModel)]="permisoRequest.fechaInicio"></p-calendar>
-                </div>
-                <div class="col-5 mb-2 lg:col-5 lg:mb-0">
-                    <label>Fecha Fin</label>
-                    <p-calendar appendTo="body" [(ngModel)]="permisoRequest.fechaFinal"></p-calendar>
-                </div>
+                    <div class="col-12 md:col-6">
+                        <label>Fecha Inicio</label>
+                        <p-calendar appendTo="body" dateFormat="dd-mm-yy" [minDate]="fechaMinima"
+                                    formControlName="fechaInicio"/>
+                        <div
+                            *ngIf="permisosFormGroup.controls.fechaInicio.invalid && (permisosFormGroup.controls.fechaInicio.dirty || permisosFormGroup.controls.fechaInicio.touched)"
+                            class="p-error">
+                            <small *ngIf="permisosFormGroup.controls.fechaInicio.errors.required">La fecha de Inicio
+                                Es requerida
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <label>Fecha Fin</label>
+                        <p-calendar appendTo="body" dateFormat="dd-mm-yy" [minDate]="fechaFinalMinima"
+                                    formControlName="fechaFinal"></p-calendar>
+                        <div
+                                *ngIf="permisosFormGroup.controls.fechaFinal.invalid && (permisosFormGroup.controls.fechaFinal.dirty || permisosFormGroup.controls.fechaFinal.touched)"
+                                class="p-error">
+                            <small *ngIf="permisosFormGroup.controls.fechaFinal.errors.required">La fecha final es requerida
+                            </small>
+                        </div>
+                        <div *ngIf="permisosFormGroup.get('fechaFinal').hasError('minDate')" class="p-error">
+                            <small> La fecha final no debe ser menor a la fecha inicio</small>
+                        </div>
+                    </div>
                 <div class="col-12 mb-2 lg:col-8 lg:mb-7">
                     <label for="descripcion">Descripcion</label>
                     <textarea
@@ -102,18 +124,15 @@
                             cols="30"
                             pInputTextarea
                             [autoResize]="true"
-                            [ngModel]="permisoRequest.descripcion">
+                            formControlName="descripcion">
                     </textarea>
+                    </div>
                 </div>
-            </ng-template>
+            </form>
             <ng-template pTemplate="footer">
                 <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="ocultarDialog()"></button>
-                <button pButton pRipple label="Solicitar" icon="pi pi-plus" class="p-button-text" (click)="solicitarPermiso()"></button>
-
-
+                <button pButton pRipple label="Solicitar" icon="pi pi-plus" class="p-button-text" (click)="crearSolicitudPermisos()"></button>
             </ng-template>
-
-
         </p-dialog>
 
 

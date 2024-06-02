@@ -11,7 +11,7 @@ import {DialogModule} from "primeng/dialog";
 import {DropdownModule} from "primeng/dropdown";
 import {CalendarModule} from "primeng/calendar";
 import {InputTextareaModule} from "primeng/inputtextarea";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BadgeModule} from "primeng/badge";
 
 
@@ -33,7 +33,8 @@ import {BadgeModule} from "primeng/badge";
         CalendarModule,
         InputTextareaModule,
         FormsModule,
-        BadgeModule
+        BadgeModule,
+        ReactiveFormsModule
     ]
 })
 export class PermisosModule { }
