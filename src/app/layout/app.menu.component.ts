@@ -83,11 +83,6 @@ export class AppMenuComponent implements OnInit {
                                         icon: 'pi pi-calendar',
                                         routerLink: ['/permisosTracking']
                                     },
-                                    {
-                                        label: 'Vacaciones',
-                                        icon: 'pi pi-calendar-minus',
-                                        routerLink: ['/vacacionesTracking']
-                                    }
 
                                 ]
                             },
