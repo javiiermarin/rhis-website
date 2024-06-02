@@ -96,10 +96,9 @@ export class PuestoComponent implements OnInit {
     }
 
     openNew() {
-        this.puestoRequest = new PuestoRequest();
+        this.puestoFormGroup.reset()
         this.puestoDialog = true;
         this.isEdit = false;
-        this.puesto = new PuestoResponse();
     }
 
     editPuesto(puestoResponse: PuestoResponse) {

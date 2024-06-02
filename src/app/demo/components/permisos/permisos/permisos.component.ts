@@ -67,7 +67,6 @@ export class PermisosComponent implements OnInit{
     })).subscribe(data => this.lstPermisoResponse = data);
 
     this.permisosDialog = false;
-    console.log(this.permisoRequest)
 
   }
 
