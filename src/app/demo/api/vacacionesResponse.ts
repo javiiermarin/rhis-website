@@ -8,6 +8,8 @@ export class VacacionesResponse{
     fechaInicio: string;
     fechaFinal: string;
     descripcion: string;
+    createdBy?: string;
+    createdAt?: string;
     empleado: EmpleadoResponse = new EmpleadoResponse();
     vacacionesTracking: VacacionesTrackingResponse [] = [];
 

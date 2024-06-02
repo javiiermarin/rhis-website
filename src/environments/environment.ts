@@ -5,9 +5,9 @@
 export const environment = {
     production: false,
     HOST: 'http://localhost:8083',
-    AUTH_KEYCLOAK: "http://localhost:8080",
+    AUTH_KEYCLOAK: "http://localhost:9091",
     REALM_KEYCLOAK: "rhis",
-    CLIENT_ID: "rhis-website",
+    CLIENT_ID: "rrhh-website",
     TRY: 4
 };
 

@@ -14,6 +14,7 @@ export class EmpleadoResponse {
     correo?: string;
     nit?: string;
     nacionalidad: string;
+    role: string;
     nivelIngles: string;
     fechaRegistro: string;
     fechaNacimiento: string;

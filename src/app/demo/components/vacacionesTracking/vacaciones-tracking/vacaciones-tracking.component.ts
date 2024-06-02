@@ -18,106 +18,101 @@ import {switchMap} from "rxjs";
 import {VacacionesTrackingRequest} from "../../../api/vacacionesTrackingRequest";
 
 @Component({
-  selector: 'app-vacaciones-tracking',
-  standalone: true,
-  imports: [
-    TableModule,
-    BadgeModule,
-    ButtonModule,
-    CalendarModule,
-    DatePipe,
-    DialogModule,
-    FormsModule,
-    InputTextareaModule,
-    NgIf,
-    RippleModule,
-    ToolbarModule
-  ],
-  templateUrl: './vacaciones-tracking.component.html',
-  styleUrl: './vacaciones-tracking.component.scss'
+    selector: 'app-vacaciones-tracking',
+    standalone: true,
+    imports: [
+        TableModule,
+        BadgeModule,
+        ButtonModule,
+        CalendarModule,
+        DatePipe,
+        DialogModule,
+        FormsModule,
+        InputTextareaModule,
+        NgIf,
+        RippleModule,
+        ToolbarModule
+    ],
+    templateUrl: './vacaciones-tracking.component.html',
+    styleUrl: './vacaciones-tracking.component.scss'
 })
-export class VacacionesTrackingComponent implements OnInit{
+export class VacacionesTrackingComponent implements OnInit {
 
-  idDivision: string= 'b5691c3c-ecce-47af-8e9c-dd7a946bdbdc';
-  estados: VacacionesTrackingResponse [] = [];
-  fechaMinima: Date = new Date();
-  fechaInicio: string;
-  fechaFinal: string;
-  vacacionesDialog: boolean= false;
-  estadoDialog: boolean = false;
-  vacaciones: VacacionesRequest = new VacacionesRequest();
-  listVacaciones : VacacionesResponse[]  = [];
+    idDivision: string = 'b5691c3c-ecce-47af-8e9c-dd7a946bdbdc';
+    estados: VacacionesTrackingResponse [] = [];
+    fechaMinima: Date = new Date();
+    fechaInicio: string;
+    fechaFinal: string;
+    vacacionesDialog: boolean = false;
+    estadoDialog: boolean = false;
+    vacaciones: VacacionesRequest = new VacacionesRequest();
+    listVacaciones: VacacionesResponse[] = [];
 
-  constructor(private vacacionesService: VacacionesService) {
-  }
+    constructor(private vacacionesService: VacacionesService) {
+    }
 
-  ngOnInit() {
-    this.vacacionesService.obtenerVacaiones().subscribe(data => {
-      this.listVacaciones = data;
-    })
+    ngOnInit() {
+        this.vacacionesService.obtenerVacaiones().subscribe(data => {
+            this.listVacaciones = data;
+        })
 
-  }
+    }
 
-  openNew(){
-    this.vacacionesDialog = true
-  }
+    openNew() {
+        this.vacacionesDialog = true
+    }
 
-  solicitudVacaciones(){
+    solicitudVacaciones() {
 
-    this.vacaciones.empleado = '0fe63b56-a867-456b-8518-643046f43bac';
-    this.fechaInicio= format(new Date(this.vacaciones.fechaInicio), 'yyyy-MM-dd');
-    this.fechaFinal= format(new Date(this.vacaciones.fechaFinal), 'yyyy-MM-dd');
+        this.vacaciones.empleado = '0fe63b56-a867-456b-8518-643046f43bac';
+        this.fechaInicio = format(new Date(this.vacaciones.fechaInicio), 'yyyy-MM-dd');
+        this.fechaFinal = format(new Date(this.vacaciones.fechaFinal), 'yyyy-MM-dd');
 
-    this.vacaciones.fechaInicio= this.fechaInicio;
-    this.vacaciones.fechaFinal= this.fechaFinal;
+        this.vacaciones.fechaInicio = this.fechaInicio;
+        this.vacaciones.fechaFinal = this.fechaFinal;
 
-    this.vacacionesService.registrarVacaciones(this.vacaciones).pipe(switchMap(() => {
-      return this.vacacionesService.obtenerVacaiones();
-    })).subscribe(data => this.listVacaciones = data);
+        this.vacacionesService.registrarVacaciones(this.vacaciones).pipe(switchMap(() => {
+            return this.vacacionesService.obtenerVacaiones();
+        })).subscribe(data => this.listVacaciones = data);
 
-  }
+    }
 
-  oculatarDialog(){
-    this.vacacionesDialog = false;
+    oculatarDialog() {
+        this.vacacionesDialog = false;
 
-  }
+    }
 
-  verEstado(vacaciones: VacacionesResponse) {
-    this.estadoDialog = true;
-    this.estados = vacaciones.vacacionesTracking
+    verEstado(vacaciones: VacacionesResponse) {
+        this.estadoDialog = true;
+        this.estados = vacaciones.vacacionesTracking
 
-    this.vacaciones.idVacaciones = vacaciones.idVacaciones;
-    this.vacaciones.fechaInicio = vacaciones.fechaInicio;
-    this.vacaciones.fechaFinal = vacaciones.fechaFinal;
-    this.vacaciones.descripcion = vacaciones.descripcion;
-    this.vacaciones.empleado = vacaciones.empleado.idEmpleado;
-    this.vacaciones.vacacionesTracking = vacaciones.vacacionesTracking.map(tracking => {
-      return {
-        idVacacionesTracking: tracking.idVacacionesTracking,
-        estado: tracking.estado
-      } as VacacionesTrackingRequest;
-    });
+        this.vacaciones.idVacaciones = vacaciones.idVacaciones;
+        this.vacaciones.fechaInicio = vacaciones.fechaInicio;
+        this.vacaciones.fechaFinal = vacaciones.fechaFinal;
+        this.vacaciones.descripcion = vacaciones.descripcion;
+        this.vacaciones.empleado = vacaciones.empleado.idEmpleado;
+        this.vacaciones.vacacionesTracking = vacaciones.vacacionesTracking.map(tracking => {
+            return {
+                idVacacionesTracking: tracking.idVacacionesTracking,
+                estado: tracking.estado
+            } as VacacionesTrackingRequest;
+        });
 
-  }
+    }
 
-  modificarEstado(vacaciones: VacacionesTrackingResponse)
-  {
-    this.vacaciones.vacacionesTracking.forEach(tracking => {
-      if (tracking.idVacacionesTracking === vacaciones.idVacacionesTracking) {
-        tracking.estado = !vacaciones.estado;
-      }
-    });
+    modificarEstado(vacaciones: VacacionesTrackingResponse) {
+        this.vacaciones.vacacionesTracking.forEach(tracking => {
+            if (tracking.idVacacionesTracking === vacaciones.idVacacionesTracking) {
+                tracking.estado = !vacaciones.estado;
+            }
+        });
 
-    this.vacacionesService.modificarVacaciones(this.vacaciones).pipe(switchMap(() => {
-      return this.vacacionesService.obtenerVacaiones();
-    })).subscribe( data => this.listVacaciones = data);
+        this.vacacionesService.modificarVacaciones(this.vacaciones).pipe(switchMap(() => {
+            return this.vacacionesService.obtenerVacaiones();
+        })).subscribe(data => this.listVacaciones = data);
 
-    this.estadoDialog = false;
-
-
-  }
-
-
+        this.estadoDialog = false;
+    }
 
 
 }

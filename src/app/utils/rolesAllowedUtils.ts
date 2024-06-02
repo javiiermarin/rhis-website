@@ -23,12 +23,12 @@ export function getRolesAllowedPermisosModule() {
  * PERMISO A MI PORTAL
  */
 export function getRolesAllowedMyPortalModule() {
-    return ['admin', 'user'];
+    return ['admin', 'user', 'rrhh'];
 }
 
 /**
  * PERMISO A MI PORTAL
  */
 export function getRolesAllowedAdministrationModule() {
-    return ['admin'];
+    return ['administracion'];
 }

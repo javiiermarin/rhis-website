@@ -15,6 +15,7 @@ import {MenuModule} from "primeng/menu";
 import {ChartModule} from "primeng/chart";
 import {RadioButtonModule} from "primeng/radiobutton";
 import { CalendarModule } from 'primeng/calendar';
+import {InputMaskModule} from "primeng/inputmask";
 
 
 
@@ -39,6 +40,7 @@ import { CalendarModule } from 'primeng/calendar';
         ChartModule,
         RadioButtonModule,
         CalendarModule,
+        InputMaskModule,
     ]
 })
 export class EmpleadoModule { }

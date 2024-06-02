@@ -1,4 +1,3 @@
-import {VacacionesTrackingResponse} from "./vacacionesTrackingResponse";
 import {VacacionesTrackingRequest} from "./vacacionesTrackingRequest";
 
 export class VacacionesRequest {

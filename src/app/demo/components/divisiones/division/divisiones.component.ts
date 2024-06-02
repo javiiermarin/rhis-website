@@ -181,24 +181,48 @@ export class DivisionesComponent implements OnInit {
             return;
         }
         const divisionRequest = this.formGroupToEntity()
+
         this.divisionService.crearDivision(divisionRequest)
             .pipe(
                 switchMap(() => this.divisionService.obtenerDivisiones()),
+                switchMap((data: DivisionResponse[]) => {
+                    this.divisionResponse = data;
+                    // Crear un array de observables para obtener los nombres de los encargados
+                    const empleadoObservables = data.map(division => {
+                        if (division.encargado) {
+                            // Si el encargado no es nulo, realizar la petición para obtener el nombre del encargado
+                            return this.empleadoService.getOne(division.encargado).pipe(
+                                map(empleado => ({
+                                    ...division,
+                                    nombreEncargado: empleado.nombres + ' ' + empleado.apellidos
+                                }))
+                            );
+                        } else {
+                            // Si el encargado es nulo, devolver directamente la división con nombreEncargado vacío
+                            return of({
+                                ...division,
+                                nombreEncargado: '' // O algún valor predeterminado si prefieres
+                            });
+                        }
+                    });
+                    // Utilizar forkJoin para esperar a que todas las peticiones de empleado se completen
+                    return forkJoin(empleadoObservables);
+                }),
                 catchError(() => {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Error',
                         detail: 'Ha ocurrido un error al crear la división. Por favor, inténtelo de nuevo.'
                     });
-                    return of(null);
+                    return of([]);
                 }),
                 finalize(() => {
                     this.loading = false;
                 })
             )
-            .subscribe(data => {
-                if (data !== null) {
-                    this.divisionResponse = data;
+            .subscribe((divisionesConNombres) => {
+                this.divisionResponse = divisionesConNombres;
+                if (divisionesConNombres.length > 0) {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Creación',

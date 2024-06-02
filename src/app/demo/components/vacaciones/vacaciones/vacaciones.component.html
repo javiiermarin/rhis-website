@@ -5,8 +5,11 @@
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
-                        <button pButton pRipple label="Solicitar Vacaciones" icon="pi pi-plus" class="p-button-success"
+                        <button pButton pRipple label="Solicitar Vacaciones" icon="pi pi-plus"
+                                class="p-button-success mr-2"
                                 (click)="openNew()"></button>
+                        <button pButton pRipple label="Autorizar Vacaciones" icon="pi pi-plus" class="p-button-help"
+                                (click)="authorizeVacations()"></button>
                     </div>
                 </ng-template>
             </p-toolbar>
@@ -107,7 +110,7 @@
                         requerida.</small>
                 </div>
                 <div *ngIf="vacationsFormGroup.get('fechaFinal').hasError('minDate')" class="p-error">
-                    <small >La fecha de final no debe ser menor a la fecha de inicio.</small>
+                    <small>La fecha de final no debe ser menor a la fecha de inicio.</small>
                 </div>
             </div>
             <div class="col-12 md:col-12">
@@ -123,4 +126,75 @@
         <button pButton pRipple label="Crear" icon="pi pi-check" class="p-button-text"
                 (click)="crearSolicitudVacaciones()"></button>
     </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="dialogAuthorizeVacations" [style]="{width:'1000px'}" header="Autorizar Vacaciosadfasnes"
+          [modal]="true">
+    <p-table #dt [value]="vacacionesToAuthorize" responsiveLayout="scroll" [rows]="10" [rowHover]="true">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Fecha de Solicitud</th>
+                <th>Descripcion</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Final</th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-vacacion>
+            <tr>
+                <td>
+                    {{ vacacion.fechaSolicitud | date: 'dd-MM-yyyy hh:mm a' }}
+                </td>
+                <td>
+                    {{ vacacion.descripcion }}
+                </td>
+                <td>
+                    {{ vacacion.fechaInicio }}
+                </td>
+                <td>
+                    {{ vacacion.fechaFinal }}
+                </td>
+                <td>
+                    <div class="flex">
+                        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2"
+                                (click)="verEstadoAutorizaciones(vacacion)"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-dialog>
+
+<p-dialog [(visible)]="estadoToAuthorizeDialog" [style]="{width:'650px'}" header="Estado de vacaciones" [modal]="true">
+    <p-table [value]="estados">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Estado</th>
+                <th>Verificacion</th>
+                <th>Division</th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-vacacionesTracking>
+            <tr>
+                <td>
+                    <p-badge value="Aprobado" severity="success" *ngIf="vacacionesTracking.estado"></p-badge>
+                    <p-badge value="No aprobado" severity="danger" *ngIf="!vacacionesTracking.estado"></p-badge>
+                </td>
+                <td>
+                    {{ vacacionesTracking.empleado.nombres }}
+                </td>
+                <td>
+                    {{ vacacionesTracking.empleado.puesto.nombre }}
+                </td>
+                <td>
+                    <button *ngIf="validateAuthorization(vacacionesTracking)"
+                            pButton pRipple icon="pi pi-verified" class="p-button-rounded p-button-success mr-2"
+                            (click)="modificarEstado(vacacionesTracking)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
 </p-dialog>

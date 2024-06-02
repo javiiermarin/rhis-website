@@ -7,6 +7,10 @@ import {VacacionesTrackingResponse} from "../../../api/vacacionesTrackingRespons
 import {format} from "date-fns";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {MessageService} from "primeng/api";
+import {KeycloakService} from "keycloak-angular";
+import {VacacionesTrackingRequest} from "../../../api/vacacionesTrackingRequest";
+import {EmpleadoResponse} from "../../../api/empleadoResponse";
+import {EmpleadoService} from "../../../service/empleado.service";
 
 @Component({
     selector: 'app-vacaciones',
@@ -21,20 +25,48 @@ export class VacacionesComponent implements OnInit {
     fechaInicio: string;
     fechaFinal: string;
     vacacionesDialog: boolean = false;
+    dialogAuthorizeVacations: boolean = false;
     estadoDialog: boolean = false;
+    estadoToAuthorizeDialog: boolean = false;
     vacaciones: VacacionesRequest = new VacacionesRequest();
     vacacionesResponse: VacacionesResponse[] = [];
+    vacacionesToAuthorize: VacacionesResponse[] = [];
     vacationsFormGroup: FormGroup;
     loading: boolean = false;
+    idUserLogged: string | undefined;
+    vacacionesTracking: VacacionesTrackingRequest[] = []
+    empleadoLogueado: EmpleadoResponse = new EmpleadoResponse();
+
 
     constructor(private vacacionesService: VacacionesService,
-                private messageService: MessageService,) {
+                private messageService: MessageService,
+                private keycloakService: KeycloakService,
+                private empleadoService: EmpleadoService) {
     }
 
     ngOnInit() {
+        if (this.keycloakService.isLoggedIn()) {
+            this.keycloakService.loadUserProfile().then(profile => {
+                this.idUserLogged = profile.id;
+                this.empleadoService.getOne(profile.id).subscribe(data => {
+                    this.empleadoLogueado = data;
+                })
+
+                // Obtener vacaciones y filtrar por el usuario logueado en VacacionesTracking
+                this.vacacionesService.obtenerVacaiones().subscribe(data => {
+                    // Filtrar vacaciones autorizadas
+                    this.vacacionesToAuthorize = data.filter(vacaciones => vacaciones.vacacionesTracking.some(tracking => tracking.empleado.idEmpleado === this.idUserLogged));
+                    // Filtrar todas las vacaciones del usuario logueado
+                    this.vacacionesResponse = data.filter(vacaciones => vacaciones.empleado.idEmpleado === this.idUserLogged);
+                });
+            }).catch(error => {
+                console.error('Failed to load user profile', error);
+            });
+        } else {
+            console.error('User not logged in');
+        }
         this.formGroupVacationsInit();
-        this.vacacionesService.obtenerVacaiones().subscribe(data =>
-            this.vacacionesResponse = data);
+
     }
 
     formGroupVacationsInit() {
@@ -68,6 +100,10 @@ export class VacacionesComponent implements OnInit {
         this.vacacionesDialog = true
     }
 
+    authorizeVacations() {
+        this.dialogAuthorizeVacations = true;
+    }
+
     crearSolicitudVacaciones() {
         if (!this.vacationsFormGroup.valid) {
             this.vacationsFormGroup.markAllAsTouched()
@@ -82,7 +118,7 @@ export class VacacionesComponent implements OnInit {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Error',
-                        detail: 'Ha ocurrido un error al crear la división. Por favor, inténtelo de nuevo.'
+                        detail: 'Ha ocurrido un error al ingresar las vacaciones. Por favor, inténtelo de nuevo.'
                     });
                     return of(null);
                 }),
@@ -104,19 +140,23 @@ export class VacacionesComponent implements OnInit {
 
     }
 
-    formGroupToEntity() {
-        const vacacionesRequest: VacacionesRequest = {
+    formGroupToEntity(isEdit: boolean = false) {
+        let vacacionesRequest: VacacionesRequest = {
             fechaInicio: format(new Date(this.vacationsFormGroup.get('fechaInicio').value), 'yyyy-MM-dd'),
             fechaFinal: format(new Date(this.vacationsFormGroup.get('fechaFinal').value), 'yyyy-MM-dd'),
             descripcion: this.vacationsFormGroup.get('descripcion').value,
             empleado: null
         };
+
+        if (isEdit){
+            vacacionesRequest.vacacionesTracking = this.vacacionesTracking
+        }
+
         return vacacionesRequest;
     }
 
     oculatarDialog() {
         this.vacacionesDialog = false;
-
     }
 
     verEstado(vacaciones: VacacionesResponse) {
@@ -124,12 +164,63 @@ export class VacacionesComponent implements OnInit {
         this.estados = vacaciones.vacacionesTracking
     }
 
+    verEstadoAutorizaciones(vacaciones: VacacionesResponse) {
+        this.estadoToAuthorizeDialog = true;
+        this.estados = vacaciones.vacacionesTracking
+
+        this.vacaciones.idVacaciones = vacaciones.idVacaciones;
+        this.vacaciones.fechaInicio = vacaciones.fechaInicio;
+        this.vacaciones.fechaFinal = vacaciones.fechaFinal;
+        this.vacaciones.descripcion = vacaciones.descripcion;
+        this.vacaciones.empleado = vacaciones.empleado.idEmpleado;
+        this.vacaciones.vacacionesTracking = vacaciones.vacacionesTracking.map(tracking => {
+            return {
+                idVacacionesTracking: tracking.idVacacionesTracking,
+                estado: tracking.estado
+            } as VacacionesTrackingRequest;
+        });
+    }
+
     // Validador personalizado para establecer la fecha mínima
     minDateValidator(startDate: Date) {
         return (control) => {
             const endDate = control.value;
-            return endDate && endDate < startDate ? { minDate: true } : null;
+            return endDate && endDate < startDate ? {minDate: true} : null;
         };
     }
+
+    modificarEstado(vacaciones: VacacionesTrackingResponse) {
+
+        this.vacaciones.vacacionesTracking.forEach(tracking => {
+            if (tracking.idVacacionesTracking === vacaciones.idVacacionesTracking) {
+                tracking.estado = !vacaciones.estado;
+            }
+        });
+
+        this.vacacionesService.modificarVacaciones(this.vacaciones).pipe(switchMap(() => {
+            return this.vacacionesService.obtenerVacaiones();
+        })).subscribe(data => this.vacacionesToAuthorize = data.filter(vacaciones => vacaciones.vacacionesTracking.some(tracking => tracking.empleado.idEmpleado === this.idUserLogged)));
+
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Creación',
+            detail: 'Vacaciones autorizadas exitosamente.!'
+        });
+
+        this.estadoToAuthorizeDialog = false;
+    }
+
+    validateAuthorization(vacacionesTracking: VacacionesTrackingResponse): boolean {
+        if(vacacionesTracking.empleado.role === 'user' && vacacionesTracking.empleado.idEmpleado === this.idUserLogged && !vacacionesTracking.estado) {
+            return true;
+        }
+
+        if (this.estados.every((estado) => estado.estado === true)){
+            return false
+        }
+
+        return this.empleadoLogueado.role === 'rrhh' && this.estados.some((estado) => estado.estado === true)  && vacacionesTracking.empleado.idEmpleado === this.idUserLogged;
+    }
+
 
 }
